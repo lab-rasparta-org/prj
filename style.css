@@ -1,0 +1,46 @@
+body {
+    background-color:white;
+}
+
+p {
+    text-align: center;
+    color: black;
+}
+
+p.projectname {
+    font-size: 3em;
+}
+
+p.projectdescription {
+    font-size: 0.7em;
+}
+
+p.license {
+    position: relative;
+    top: 50px;
+    font-size: 0.5em;
+    color: gray;
+}
+
+p.menu {
+    font-family: monospace;
+    text-shadow: 0px 0px 5px gray;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+}
+
+a.license {
+    color: gray;
+    text-decoration: none;
+
+}
+
+a.menu {
+    font-weight: bold;
+    text-decoration: none;
+    color: black;
+    text-shadow: 0 0 5 inherit;
+}
