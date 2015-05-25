@@ -1,1 +1,11 @@
-A program to help you manage your projects and your chaotic home directory.
+Name:
+	prj - A program to help you manage your projects and your chaotic home directory.
+
+Usage:
+	prj [help]
+	prj list [<CategoryName>|<CategoryNumber>]
+	prj about|do|done|kill|new|next|show|todo|undone <Project>
+	prj move|mv <Project> <CategoryName>|<CategoryNumber>
+	prj search <ProjectName>|<Expression>
+	prj run <ProjectName> <ScriptName> [<ScriptParamenters>]
+	prj rename <ProjectInicialName> <ProjectFinalName>
