@@ -18,772 +18,998 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## CONFIGURATION
-## Configure me here:
+#  Configure me here
+# Where do you want your stuff? If you leave this as is, I'll try to get the proper values from the environment.
+# Otherwise I'll just use default values, hoping they're ok for you. I can make mistakes, though.
 
-# Assign suitable names to category0name, category1name, category2name and category3name variables to classify your projects.
-category0name="Desktop"
-category1name="Projects"
-category2name="Ideas"
-category3name="Dreams"
+# A directory to store your projects.
+# Skip this if you have configured XDG_PROJECTS_DIR in your ~/.config/user-dirs.dirs file.
+#projectsdir=~/projects
+
+# A directory to store your archives.
+# Skip this if you have configured XDG_BACKUPS_DIR in your ~/.config/user-dirs.dirs file.
+#archivesdir=~/backups
+
+# The name of your working directory.
+# Skip this if you have configured XDG_DESKTOP_DIR in your ~/.config/user-dirs.dirs file.
+#workingcategorydir=~
+#workingcategorydir=~/Desktop
+
+# A fancy name for your working category.
+workingcategoryname="Desktop"
+
+# It's prefix.
+workingcategoryprefix="0"
+
+# What version control system do you want to use?
+# Possible options are "git", "hg" (for mercury) or "none" for no use of a VCS. You really should consider using one.
+preferredvcs="git"
+
+# What is your preferred file compressor?
+# I'll look for one or choose "none" for compression unless you provide me with a value for the next variable.
+# Possible values are "bzip2", "gzip", "xz", "compress", "lzip", "lzma", "lzop" or any other provided it is compatible with -I option of the tar command and is accessible to you.
+preferredcompressor="bzip2"
+
+# What is your preferred text editor?
+# I'll look for one unless you provide me with a value for the next variable.
+#preferrededitor=emacs23-nox
+preferrededitor="emacs23-nox"
 
 # Are you done with the configurations above? If so, change next variable to "Yes" (note capitalization!).
-doneconfiguring=No
-## END OF CONFIGURATION
-## Stop configuring, your task is done here. Go use me and be marry.
+doneconfiguring="No"
 
-## AUTO-SETUP
-## Let's define a working environment for myself...
+## CONFIGURATION END
+#  Stop configuring, your job is done here. Go use me and be marry.
+ 
+## INITIALIZATION
+#  Let's set up an appropriete environment for myself...
+ 
+## FUNCTIONS
+#  Here's how I work:
 
-# What to do if I am not configured?
-execnotconfigured () {
-    cat << EOF
+archiveproject() {
+[ -z "$1" ] && return 1
+local command
+local destination
+local returnvalue
+returnvalue=0
+case $(basename $preferredcompressor) in
+    bzip2)
+	command="tar -C	"$workingcategorydir" -cpjf"
+	destination="$archivesdir/$(gettimestamp).$1.tbz"
+	;;
+    gzip)
+	command="tar -C	"$workingcategorydir" -cpzf"
+	destination="$archivesdir/$(gettimestamp).$1.tgz"
+	;;
+    xz)
+	command="tar -C	"$workingcategorydir" -cpJf"
+	destination="$archivesdir/$(gettimestamp).$1.txz"
+	;;
+    compress)
+	command="tar -C	"$workingcategorydir" -cpZf"
+	destination="$archivesdir/$(gettimestamp).$1.tZ"
+	;;
+    lzip)
+    	command="tar -C	"$workingcategorydir" --lzip -cpf"
+    	destination="$archivesdir/$(gettimestamp).$1.tlz"
+    	;;
+    lzma)
+    	command="tar -C	"$workingcategorydir" --lzma -cpf"
+    	destination="$archivesdir/$(gettimestamp).$1.tar.lzma"
+    	;;
+    lzop)
+    	command="tar -C	"$workingcategorydir" --lzop -cpf"
+    	destination="$archivesdir/$(gettimestamp).$1.tar.lzo"
+    	;;
+    none)
+    	command="tar -C	"$workingcategorydir" -cpf"
+    	destination="$archivesdir/$(gettimestamp).$1.tar"
+    	;;
+    *)
+	command="tar -C	"$workingcategorydir" -I "$preferredcompressor" -cpf"
+	destination="$archivesdir/$(gettimestamp).$1.tar.compressed"
+	;;
+esac
+$command $destination "$1" || returnvalue=1
+unset command
+unset destination
+return $returnvalue
+}
+
+askuseryn() {
+    read answer
+    case $answer in
+	y|Y)
+	    return 0
+	    ;;
+	*)
+	    return 1
+	    ;;
+    esac
+}
+
+checkconfiguration() {
+    if [ "$doneconfiguring" != "Yes" ]
+    then
+	cat << EOF
 Configure me first. It'll only take you a moment!
-
+ 
 EOF
-    exit 1
+	return 1
+    else
+	return 0
+    fi
 }
 
-# What to do if I can't have what I need?
-execinstalldependenciesfirst () {
-    cat << EOF
-Sorry, I need, at least, which, basename, bzip2, cat, cut, date, grep, head, ls, mv, rm, sort, tail, tar, touch, tr and wc commands to work.
+checkvcs() {
+    if [ "$preferredvcs" = "none" ]
+    then
+	return 0
+    else
+	[ $(which $preferredvcs) ] && return 0 || return 1
+	return 1
+    fi
+}
+
+checkfundamentalprograms() {
+    local returnvalue
+    returnvalue=0
+    [ $(which which 2>/dev/null) ] || { echo "Cannot find which command."; returnvalue=1; }
+    for program in basename cat cut date grep head ls mkdir mktemp mv rm sort tail tar touch tr wc $preferredcompressor $preferrededitor
+    do
+	[ $(which $program) ] ||  { echo "$program: Not found."; returnvalue=1; }
+    done
+    if [ $returnvalue = 1 ]
+    then
+	cat << EOF
+Sorry, I need those commands to work. Also a compressor and an editor.
 You'll need to install them first, or hack on the code!
-Also column and less or more would be nice.
 ;-)
-
+ 
 EOF
-    exit 1
+    fi
+    return $returnvalue
 }
 
-# What to show if in pannic?
-printhelpmessage () {
+createcategory() {
+    local newcategoryname
+    local newcategoryprefix
+    newcategoryprefix="$(echo "$1"|cut -s -f 1 -d '.')"
+    if [ -n "$newcategoryprefix" ]
+    then
+	newcategoryname=$(echo $1|cut -f 2- -d ".")
+    else
+	newcategoryname="$1"
+    fi
+    if [ "$newcategoryprefix" = "" ]
+    then
+	read -p "Do you want to give a prefix to "$1"? Write it here: " newcategoryprefix
+    fi
+    if [ -n "$newcategoryprefix" ]
+    then
+	mkdir $projectsdir/$newcategoryprefix.$newcategoryname
+    else
+	mkdir $projectsdir/$newcategoryname
+    fi
+    unset newcategoryname
+    unset newcategoryprefix
+}
+
+createproject() {
+    [ -z "$1" ] && return 1
+    local returnvalue
+    returnvalue=0
+    mkdir "$workingcategorydir"/"$1" || returnvalue=1
+    mkdir "$workingcategorydir"/"$1"/trash || returnvalue=1
+    mkdir "$workingcategorydir"/"$1"/."$(basename "$0")" || returnvalue=1
+    echo ""$1" has not yet been described." >  "$workingcategorydir"/"$1"/README || returnvalue=1
+    echo "* TODO Edit the README and the TODO files." >  "$workingcategorydir"/"$1"/TODO || returnvalue=1
+    case $preferredvcs in
+	git)
+	    git init "$workingcategorydir"/"$1" >/dev/null
+	    returnvalue=1
+	;;
+	hg)
+	    hg init "$workingcategorydir"/"$1" >/dev/null
+	    returnvalue=1
+	;;
+	*)
+	;;
+    esac
+    return $returnvalue
+}
+
+findinproject() {
+    [ -z "$2" ] && return 1
+    local expression
+    local project
+    local match
+    project="$1"
+    shift
+    expression=$@
+    match=$(cat $(getcategorydir $(getprojectcategory $project))/$project/README 2>/dev/null | grep -i "${expression}")
+    [ -n "$match" ] && echo ""$project README":\n${match}"
+    match=$(cat $(getcategorydir $(getprojectcategory $project))/$project/TODO 2>/dev/null | grep -i "${expression}")
+    [ -n "$match" ] && echo ""$project TODO":\n${match}"
+    unset expression
+    unset project
+    unset match
+}
+
+fixproject() {
+    [ -z "$1" ] && return 1
+    returnvalue=0
+    [ -f $(getcategorydir $(getprojectcategory "$1"))/"$1"/README ] || echo ""$1" has not yet been described." > $(getcategorydir $(getprojectcategory "$1"))/"$1"/README || returnvalue=1
+    [ -f $(getcategorydir $(getprojectcategory "$1"))/"$1"/TODO ] || echo "* TODO Edit the README and the TODO files." > $(getcategorydir $(getprojectcategory "$1"))/"$1"/TODO || returnvalue=1
+    [ -d $(getcategorydir $(getprojectcategory "$1"))/"$1"/.$0 ] || mkdir $(getcategorydir $(getprojectcategory "$1"))/"$1"/.$(basename $0) || returnvalue=1
+    [ -d $(getcategorydir $(getprojectcategory "$1"))/"$1"/trash ] || mkdir $(getcategorydir $(getprojectcategory "$1"))/"$1"/trash || returnvalue=1
+    case "$preferredvcs" in
+	git)
+	[ -d $(getcategorydir $(getprojectcategory "$1"))/"$1"/.git ] || git init -q $(getcategorydir $(getprojectcategory "$1"))/"$1" || returnvalue=1
+	;;
+	hg)
+	[ -d $(getcategorydir $(getprojectcategory "$1"))/"$1"/.hg ] || hg init $(getcategorydir $(getprojectcategory "$1"))/"$1" || returnvalue=1
+	;;
+	*)
+	;;
+    esac
+    return $returnvalue
+}
+
+getarchivetimestamp() {
+    [ -z "$1" ] && return 1
+    local archive
+    local archivedate
+    archive=$(ls "$archivesdir"/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]."$1".* 2>/dev/null | sort | tail -n 1)
+    [ -z "$archive" ] && return 1
+    [ -r "$archive" ] || return 1
+    archivedate=$(echo $(basename "$archive") | cut -f 1 -d ".")
+    [ -z "$archivedate" ] && return 1
+    echo $archivedate
+    unset archive
+    unset archivedate
+    return 0
+}
+
+getcategorydir() {
+    [ -z "$1" ] && return 1
+    local dir
+    if [ "$1" = "$workingcategoryprefix" ] || [ "$1" = "$workingcategoryname" ] || [ "$1" = "$workingcategoryprefix.$workingcategoryname" ]
+    then
+	echo "$workingcategorydir"
+    else
+	[ ! -d $projectsdir/$1 ] && [ ! -d $projectsdir/$1.*/ ] && [ ! -d $projectsdir/*.$1/ ] && return 1
+	[ -d $projectsdir/$1.* ] && dir="$(echo $projectsdir/$1.* | cut -f 1 -d " ")"
+	[ -d $projectsdir/*.$1 ] && dir="$(echo $projectsdir/*.$1 | cut -f 1 -d " ")"
+	[ -d $projectsdir/$1 ] && dir="$projectsdir/$1"
+	echo "$dir"
+    fi
+    unset dir
+    return 0
+}
+
+getcategoryname() {
+    [ -z "$1" ] && return 1
+    local dir
+    if [ "$1" = "$workingcategoryprefix" ] || [ "$1" = "$workingcategoryname" ] || [ "$1" = "$workingcategoryprefix.$workingcategoryname" ]
+    then
+	echo "$workingcategoryname"
+    else
+	[ ! -d $projectsdir/$1 ] && [ ! -d $projectsdir/$1.* ] && [ ! -d $projectsdir/*.$1 ] && return 1
+	[ -d $projectsdir/$1.* ] && dir="$(echo $projectsdir/$1.* | cut -f 1 -d " ")"
+	[ -d $projectsdir/*.$1 ] && dir="$(echo $projectsdir/*.$1 | cut -f 1 -d " ")"
+	[ -d $projectsdir/$1 ] && dir="$projectsdir/$1"
+	echo "$(basename "$dir")" | cut -f 2 -d "."
+    fi
+    unset dir
+    return 0
+}
+
+getcategoryprefix() {
+    [ -z "$1" ] && return 1
+    local dir
+    if [ "$1" = "$workingcategoryprefix" ] || [ "$1" = "$workingcategoryname" ] || [ "$1" = "$workingcategoryprefix.$workingcategoryname" ]
+    then
+	echo "$workingcategoryprefix"
+    else
+	[ ! -d $projectsdir/$1 ] && [ ! -d $projectsdir/$1.* ] && [ ! -d $projectsdir/*.$1 ] && return 1
+	[ -d $projectsdir/$1.* ] && dir="$(echo $projectsdir/$1.* | cut -f 1 -d " ")"
+	[ -d $projectsdir/*.$1 ] && dir="$(echo $projectsdir/*.$1 | cut -f 1 -d " ")"
+	[ -d $projectsdir/$1 ] && dir="$projectsdir/$1/"
+	echo "$(basename "$dir")" | cut -f 1 -d "."
+    fi
+    unset dir
+    return 0
+}
+
+getcategorystatus() {
+    [ -z "$1" ] && return 1
+    echo "[$(getcategoryname "$1")]\nprefix: $(getcategoryprefix "$1")\nprojects: $(listcategoryprojects "$1" | wc -l)"
+    return 0
+}
+
+gethomesetup() {
+    local returnvalue
+    returnvalue=0
+    [ -r ~/.config/user-dirs.dirs ] && . ~/.config/user-dirs.dirs
+    [ -z "$projectsdir" -a -n "$XDG_PROJECTS_DIR" ] && projectsdir="$XDG_PROJECTS_DIR"
+    [ -z "$projectsdir" ] && projectsdir=~/projects
+    [ -z "$workingcategorydir" -a -n "$XDG_DESKTOP_DIR" ] && workingcategorydir="$XDG_DESKTOP_DIR"
+    [ -z "$workingcategorydir" ] && workingcategorydir=~
+    [ -z "$archivesdir" -a -n "$XDG_BACKUPS_DIR" ] && archivesdir="$XDG_BACKUPS_DIR"
+    [ -z "$archivesdir" ] && archivesdir=~/backups
+    [ -d $projectsdir ] || mkdir -p $projectsdir 2>/dev/null || { echo "Cannot access or create your projects directory."; returnvalue=1; }
+    [ -w $projectsdir ] || { echo "Cannot write to your projects directory."; returnvalue=1; }
+    [ -d $workingcategorydir ] || mkdir -p $workingcategorydir 2>/dev/null || { echo "Cannot access or create your working directory."; returnvalue=1; }
+    [ -w $workingcategorydir ] || { echo "Cannot write to your working directory."; returnvalue=1; }
+    [ -d $archivesdir ] || mkdir -p $archivesdir 2>/dev/null || { echo "Cannot access or create your archives directory."; returnvalue=1; }
+    [ -w $archivesdir ] || { echo "Cannot write to your archives directory."; returnvalue=1; }
+    return $returnvalue
+}
+
+getid() {
+    [ -z "$1" ] && return 1
+    [ -d "$workingcategorydir"/$1 ] && { echo "project"; return 0; }
+    [ -d "$projectsdir"/*/"$1" ] && { echo "project"; return 0; }
+    [ -d "$projectsdir"/"$1" ] && { echo "category"; return 0; }
+    [ -d "$projectsdir"/"$1".* ] && { echo "category"; return 0; }
+    [ -d "$projectsdir"/*."$1" ] && { echo "category"; return 0; }
+    [ "$1" = "$workingcategoryname" ] && { echo "category"; return 0; }
+    [ "$1" = "$workingcategoryprefix" ] && { echo "category"; return 0; }
+    return 1
+}
+
+getpreferredcompressor() {
+    if [ -z "$preferredcompressor" ]
+    then
+	preferredcompressor=$(basename $(which bzip2)) || preferredcompressor=$(basename $(which gzip)) || preferredcompressor=$(basename $(which xz)) || preferredcompressor=$(basename $(which compress)) || preferredcompressor=$(basename $(which lzop)) || preferredcompressor="none"
+    fi
+    [ -n "$preferredcompressor" ] && return 0 || return 1
+}
+
+getpreferrededitor() {
+    if [ -z "$preferrededitor" ]
+    then
+	preferrededitor=$(which $EDITOR) || preferrededitor=$(which editor) || preferrededitor=$(which emacs) || preferrededitor=$(which vi) || preferrededitor=$(which vim) || preferrededitor=$(which nano) || unset preferrededitor
+    fi
+    [ -n "$preferrededitor" ] && return 0 || return 1
+}
+
+getprojectcategory() {
+    [ -z "$1" ] && return 1
+    [ -d "$workingcategorydir"/"$1" ] && { echo "$workingcategoryname"; return 0; }
+    [ -d "$projectsdir"/*/"$1" ] && { echo "$(basename $(dirname $(echo "$projectsdir"/*/"$1")) | cut -f 2 -d "." )"; return 0; }
+    return 1
+}
+
+getprojectstatus() {
+    [ -z "$1" ] && return 1
+    local projectdir
+    projectdir="$(getcategorydir $(getprojectcategory "$1"))/"$1""
+    echo "Project: "$1""
+    [ -r "$projectdir"/README ] && { printf "Description: "; head -n 1 "$projectdir"/README; } || returnvalue=1
+    if [ -d "$projectdir"/.git ]
+    then
+	echo "By: $(git --git-dir="$projectdir"/.git config --get user.name) <$(git --git-dir="$projectdir"/.git config --get user.email)>"
+    else
+	echo "By: $USERNAME"
+    fi
+    [ -r "$projectdir"/TODO ] && { printf "Tasks: "; grep ^"*\ TODO" "$projectdir"/TODO | wc -l; } || returnvalue=1
+    if [ $(ls "$projectdir"/."$(basename $0)"/ 2>/dev/null | grep .sh$ | wc -w) -gt 0 ]
+    then
+    	local script
+	for script in "$projectdir"/."$(basename $0)"/*.sh
+	do
+	    printf "Script: $(basename $script .sh) - "
+	    $script aboutme
+	done
+    	unset script
+    fi
+    if [ $(ls "$projectdir"/."$(basename $0)"/ 2>/dev/null | grep ^"depends-" | wc -w) -gt 0 ]
+    then
+    	local dependency
+	for dependency in "$projectdir"/."$(basename $0)"/depends-*
+	do
+	    printf "Depends on: "
+	    echo "$(basename $dependency)" | cut -f 2 -d "-"
+	done
+    	unset dependency
+    fi
+    unset projectdir
+    return $returnvalue
+}
+
+gettimestamp() {
+    echo "$(date +%Y-%m-%d)"
+}
+
+killarchive() {
+[ -z $1 ] && return 1
+local archive
+local returnvalue
+returnvalue=0
+case $(basename $preferredcompressor) in
+     bzip2)
+	archive="$archivesdir"/$(getarchivetimestamp $1)."$1".tbz
+	;;
+    gzip)
+	archive="$archivesdir"/$(getarchivetimestamp $1)."$1".tgz
+    	;;
+    xz)
+	archive="$archivesdir"/$(getarchivetimestamp $1)."$1".txz
+	;;
+    compress)
+	archive="$archivesdir"/$(getarchivetimestamp $1)."$1".tZ
+	;;
+    lzip)
+	archive="$archivesdir"/$(getarchivetimestamp $1)."$1".tlz
+	;;
+    lzma)
+	archive="$archivesdir"/$(getarchivetimestamp $1)."$1".tar.lzma
+	;;
+    lzop)
+	archive="$archivesdir"/$(getarchivetimestamp $1)."$1".tar.lzo
+	;;
+    none)
+	archive="$archivesdir"/$(getarchivetimestamp $1)."$1".tar
+	;;
+    *)
+	archive="$archivesdir"/$(getarchivetimestamp $1)."$1".tar.compressed
+    	;;
+esac
+rm $archive || returnvalue=1
+unset archive
+return $returnvalue
+}
+
+killcategory() {
+    [ -z "$1" ] && return 1
+    local categoryname
+    categoryname="$(getcategoryname "$1")"
+    local categorydir
+    categorydir="$(getcategorydir "$categoryname")"
+    rm -fr "$categorydir"
+    unset categoryname
+    unset categorydir
+    [ -d "$categorydir" ] && return 1 || return 0    
+}
+
+killproject() {
+    [ -z "$1" ] && return 1
+    rm -fr "$workingcategorydir"/"$1"
+    [ -d "$workingcategorydir"/"$1" ] && return 1 || return 0
+}
+
+listarchives() {
+    ls -1 $archivesdir && return 0
+    return 1
+}
+
+listcategories() {
+    ls -1r $projectsdir | cut -f 2- -d "."
+    echo $workingcategoryname
+}
+
+listcategoryprojects() {
+    [ -z "$1" ] && return 1
+    local dir
+    dir=$(getcategorydir $1)
+    [ -z "$dir" ] && return 1
+    ls -1 "$dir"
+    unset dir
+    return 0
+}
+
+moveproject() {
+    local origin
+    local destiny
+    origin="$(getcategorydir "$(getprojectcategory "$1")")"
+    destiny="$(getcategorydir "$2")"
+    [ "$origin" = "$workingcategorydir" ] && [ -f "$workingcategorydir"/"$1"/".hidden" ] && return 1
+    [ "$origin" = "$workingcategorydir" ] && { mv "$workingcategorydir"/"$1" "$destiny" && return 0; }
+    [ "$destiny" = "$workingcategorydir" ] && { mv "$origin"/"$1" "$workingcategorydir" && return 0; }
+    mv "$origin"/"$1" "$destiny" && return 0
+    unset origin
+    unset destiny
+}
+
+printhelpmessage() {
     cat << EOF
 Name:
 	$(basename $0) - A program to help you manage your projects and your chaotic home directory.
-
+ 
 Usage:
-	$(basename $0) [help]
-	$(basename $0) list [<CategoryName>|<CategoryNumber>]
-	$(basename $0) about|do|done|kill|new|next|show|todo|undone <Project>
-	$(basename $0) move|mv <Project> <CategoryName>|<CategoryNumber>
-	$(basename $0) search <ProjectName>|<Expression>
-	$(basename $0) run <ProjectName> <ScriptName> [<ScriptParamenters>]
-	$(basename $0) rename <ProjectInicialName> <ProjectFinalName>
-
+	$(basename $0) [do] <projectname>
+	$(basename $0) [done | fix | kill] <projectname(s)>
+	$(basename $0) [help | listarchives|lsa | listcategories|lsc]
+	$(basename $0) [killcategory] <categoryname(s)>
+	$(basename $0) [list|ls | listprojects|lsp] [<categoryname(s)>]
+	$(basename $0) [move|mv] <projectname> <categoryname>
+	$(basename $0) [new] <projectname(s)>
+	$(basename $0) [newcategory] <categoryname(s)>
+	$(basename $0) [read | todo] <projectname>
+	$(basename $0) [rename|rn] <projectname> <projectname>
+	$(basename $0) [run] <projectname> <scriptname> [<scriptargument(s)]
+	$(basename $0) [find] <expression>
+	$(basename $0) [status|st] [<categoryname(s)>|<projectname(s)>]
+	$(basename $0) [redo | undone] <archive(s)>
+ 
 EOF
 }
 
-# What to show if asked to remove something that is not supposed to be removed?
+printonlyonworking() {
+    cat <<EOF
+You can only do that on projects you are currently working on (under $workingcategoryname).
+EOF
+}
+
 printstandardproject () {
 	    cat << EOF
 This project doesn't seem to be suitable for moving away from your working directory.
 It has a .hidden file in it meaning it is meant to stay in there and look pretty.
 If this is not the case, remove the file and try again.
-
+ 
 EOF
-	    exit 1
 }
 
-# Have you configured me propperly?...
-[ "$doneconfiguring" != "Yes" ] && execnotconfigured
+renameproject() {
+[ -z "$1" ] || [ -z "$2" ] && return 1
+mv $(getcategorydir $(getprojectcategory "$1"))/"$1"  $(getcategorydir $(getprojectcategory "$1"))/"$2" && return 0
+return 1
+}
 
-# Let's number your categorys:
-category0number="0"
-category1number="1"
-category2number="2"
-category3number="3"
+runshell() {
+    [ -z "$1" ] && return 1
+    if [ "$(basename $SHELL)" = "bash" ]
+    then
+	vcsvalue="."
+	[ -d "$workingcategorydir"/"$1"/.hg ] && vcsvalue="m"
+	[ -d "$workingcategorydir"/"$1"/.git ] && vcsvalue="g"
+	tmpbashrc=$(mktemp /tmp/XXXXXXXX)
+	cat <<EOF > $tmpbashrc
+set -o ignoreeof
+[ -r ~/.bashrc ] && source ~/.bashrc
+alias $(basename $0)='echo "Cannot use $(basename $0) inside $(basename $0)." #'
+alias exit='cd "$workingcategorydir"/"$1"; [ -d .git ] && { [ -z "$(git status --porcelain)" ] && exit || echo "You have uncommited changes. You can force exit with unalias exit; exit."; } || exit'
+cd "$workingcategorydir"/"$1"
+PS1='\[\e[0;34m\]\
+[ $1 ] \
+( $(date +%Y-%m-%d) ) \
+$(printf $vcsvalue)\
+$([ -d "$workingcategorydir"/"$1"/trash ] && printf "t" || printf "." )\
+$(case $(basename $preferrededitor) in emacs*) printf "e";; vi|vim) printf "v";; nano) printf "n";; cat) printf "c";; *) [ -z $(basename $preferrededitor) ] && printf "." || printf "?";; esac)\
+$(case $preferredcompressor in bzip*) printf "b";; gzip) printf "g";; xz) printf "x";; compress) printf "c";; lzip) printf "l";; lzma) printf "m";; lzop) printf "o";; none) printf ".";; *) printf "?";; esac)  \
+$(date +%H:%M)... \t\
+\n\
+\w\$ \
+\[\e[0m\]'
+EOF
+	bash --rcfile $tmpbashrc
+	rm $tmpbashrc
+    else
+	cd "$workingcategorydir"/"$1"
+	sh
+    fi
+}
 
-# Have you configured your freedesktop propperly?
-[ -r ~/.config/user-dirs.dirs ] && . ~/.config/user-dirs.dirs
-[ -n "$XDG_DOCUMENTS_DIR" ] && workingdir="$XDG_DOCUMENTS_DIR" || workingdir=~
-[ -n "$XDG_BACKUPS_DIR" ] && backupsdir="$XDG_BACKUPS_DIR" || backupsdir=~
-[ -n "$XDG_PROJECTS_DIR" ] && projdbdir="$XDG_PROJECTS_DIR" || projdbdir=~
+unarchiveproject() {
+[ -z $1 ] && return 1
+local command
+local origin
+local returnvalue
+returnvalue=0
+case $(basename $preferredcompressor) in
+    bzip2)
+	command="tar -C	"$workingcategorydir" -xpjf"
+	origin="$archivesdir/$(getarchivetimestamp $1).$1.tbz"
+	;;
+    gzip)
+    	command="tar -C	"$workingcategorydir" -xpzf"
+    	origin="$archivesdir/$(getarchivetimestamp $1).$1.tgz"
+    	;;
+    xz)
+	command="tar -C	"$workingcategorydir" -xpJf"
+	origin="$archivesdir/$(getarchivetimestamp $1).$1.txz"
+	;;
+    compress)
+	command="tar -C	"$workingcategorydir" -xpZf"
+	origin="$archivesdir/$(getarchivetimestamp $1).$1.tZ"
+	;;
+    lzip)
+	command="tar -C	"$workingcategorydir" --lzip -xpf"
+	origin="$archivesdir/$(getarchivetimestamp $1).$1.tlz"
+	;;
+    lzma)
+	command="tar -C	"$workingcategorydir" --lzma -xpf"
+	origin="$archivesdir/$(getarchivetimestamp $1).$1.tar.lzma"
+	;;
+    lzop)
+	command="tar -C	"$workingcategorydir" --lzop -xpf"
+	origin="$archivesdir/$(getarchivetimestamp $1).$1.tar.lzo"
+	;;
+    none)
+	command="tar -C "$workingcategorydir" -xpf"
+	origin="$archivesdir/$(getarchivetimestamp $1).$1.tar"
+	;;
+    *)
+    	command="tar -C	"$workingcategorydir" -I "$preferredcompressor" -xpf"
+    	origin="$archivesdir/$(getarchivetimestamp $1).$1.tar.commpressed"
+    	;;
+esac
+$command $origin || returnvalue=1
+unset command
+unset origin
+return $returnvalue
+}
 
-# Do you have git installed?
-[ $(which git) ] && gitinstalled="Yes" || gitinstalled="No"
+# CHECKS
+# Before I start making mistakes.
 
-# How would you want stuff displayed to you?
-displayer=$(which less) || displayer=$(which more) || displayer=$(which cat)
+# Before anything else, am I configured?
+checkconfiguration || exit 1
 
-# Can I display stuff in columns?
-[ $(which column) ] && columnformat="Yes" || columnformat="No"
+# What is yout preferred file compressor?
+getpreferredcompressor || exit 1
 
-# Have you configured me?...
-[ -z "$projdbdir" ] && execnotconfigured
-# ...propperly?!
-[ ! -r "$projdbdir" ] && execnotconfigured
-[ ! -w "$projdbdir" ] && execnotconfigured
+# What is your preferred text editor?
+getpreferrededitor || exit 1
 
 # Do I have access to fundamental programs I need?
-[ $(which which 2>/dev/null) ] || execinstalldependenciesfirst
-[ -n "$displayer" ] || execinstalldependenciesfirst
-[ $(which basename) ] || execinstalldependenciesfirst
-[ $(which bzip2) ] || execinstalldependenciesfirst
-[ $(which cat) ] || execinstalldependenciesfirst
-[ $(which cut) ] || execinstalldependenciesfirst
-[ $(which date) ] || execinstalldependenciesfirst
-[ $(which grep) ] || execinstalldependenciesfirst
-[ $(which head) ] || execinstalldependenciesfirst
-[ $(which ls) ] || execinstalldependenciesfirst
-[ $(which mkdir) ] || execinstalldependenciesfirst
-[ $(which mv) ] || execinstalldependenciesfirst
-[ $(which rm) ] || execinstalldependenciesfirst
-[ $(which sort) ] || execinstalldependenciesfirst
-[ $(which tail) ] || execinstalldependenciesfirst
-[ $(which tar) ] || execinstalldependenciesfirst
-[ $(which touch) ] || execinstalldependenciesfirst
-[ $(which tr) ] || execinstalldependenciesfirst
-[ $(which wc) ] || execinstalldependenciesfirst
+checkfundamentalprograms || exit 1
 
-## Ok, let's continue, then...
+# Have you configured your freedesktop propperly?
+gethomesetup || exit 1
+ 
+## INITIALIZATION END
+#  Should be all set now.
+
+## MAIN
+#  Let's work, then...
 case $1 in
-
-    about)
-	if [ -z "$2" ]
-	then
-	    printhelpmessage
-	    exit 1
-	else
-	    shift
-	    for argument in "$@"
-	    do
-		case "$argument" in
-		    $category0name)
-		    echo "* \"$argument\" is a category (numbered $category0number) with $(eval echo $workingdir/* |wc -w) projects in it."
-		    echo
-		    ;;
-		    $category0number)
-		    echo "* $argument is a category (named \"$category0name\") with $(eval echo $workingdir/* |wc -w) projects in it."
-		    echo
-		    ;;
-		    $category1name)
-		    echo "* \"$argument\" is a category (numbered $category1number) with $(eval echo $projdbdir/1.* |wc -w) projects in it."
-		    echo
-		    ;;
-		    $category1number)
-		    echo "* $argument is a category (named \"$category1name\") with $(eval echo $projdbdir/1.* |wc -w) projects in it."
-		    echo
-		    ;;
-		    $category2name)
-		    echo "* \"$argument\" is a category (numbered $category2number) with $(eval echo $projdbdir/2.* |wc -w) projects in it."
-		    echo
-		    ;;
-		    $category2number)
-		    echo "* $argument is a category (named \"$category2name\") with $(eval echo $projdbdir/2.* |wc -w) projects in it."
-		    echo
-		    ;;
-		    $category3name)
-		    echo "* \"$argument\" is a category (numbered $category3number) with $(eval echo $projdbdir/3.* |wc -w) projects in it."
-		    echo
-		    ;;
-		    $category3number)
-		    echo "* $argument is a category (named \"$category3name\") with $(eval echo $projdbdir/3.* |wc -w) projects in it."
-		    echo
-		    ;;
-		    *)
-			if ([ ! -d "$workingdir"/"$argument" ] && [ ! -d "$projdbdir/"[1-3]".$argument" ])
-			then
-			    echo "Sorry, cannot find \"$argument\"!"
-			    echo
-			else
-			    [ -d "$workingdir"/"$argument" ] && echo "* \"$argument\" in \"$category0name\" ($category0number)."
-			    [ -d "$projdbdir"/1."$argument" ] && echo "* \"$argument\" in \"$category1name\" ($category1number)."
-			    [ -d "$projdbdir"/2."$argument" ] && echo "* \"$argument\" in \"$category2name\" ($category2number)."
-			    [ -d "$projdbdir"/3."$argument" ] && echo "* \"$argument\" in \"$category3name\" ($category3number)."
-			    if [ "$gitinstalled" = "Yes" ]
-			    then
-				if [ -d "$workingdir"/"$argument"/.git ]
-				then
-				    echo "By: $(git --exec-path="$workingdir"/"$argument" config --get user.name) <$(git --exec-path="$workingdir"/"$argument" config --get user.email)>"
-				elif [ -d "$projdbdir"/[1-3]."$argument"/.git ]
-				then
-				    echo "By: $(git --exec-path="$projdbdir"/[1-3]."$argument" config --get user.name) <$(git --exec-path="$projdbdir"/[1-3]."$argument" config --get user.email)>"
-				else
-				    echo "By: $USERNAME"
-				fi
-			    else
-				echo "By: $USERNAME"
-			    fi
-			    if [ -d "$workingdir"/"$argument" ]
-			    then
-				if [ -r "$workingdir"/"$argument/README" ]
-				then
-				    head -n 1 "$workingdir"/"$argument"/"README"
-				else
-				    echo "You didn't provide a README file for \"$argument\" yet!"
-				fi
-				if [ -f "$workingdir/$argument/TODO" ]
-				then
-				    echo "Tasks: $(grep ^"*\ TODO" "$workingdir/$argument/TODO" | wc -l) listed."
-				    echo "Next task: $(grep ^"*\ TODO" "$workingdir/$argument/TODO" | cut -f 3- -d " " | head -n 1)"
-				else
-				    echo "Tasks: You didn't provide a TODO file for \"$(basename $argument)\" yet!"				    
-				    echo "Next task: You didn't provide a TODO file for \"$(basename $argument)\" yet!"				    
-				fi
-				if [ $(ls "$workingdir/$argument/.$(basename $0)/" 2>/dev/null | grep .sh$ | wc -w) -gt 0 ]
-				then
-				    for script in $(eval ls "$workingdir/$argument/.$(basename $0)/"*.sh 2>/dev/null )
-				    do
-					if [ -x $script ]
-					then
-					    scriptname=$(basename $script .sh)
-					    echo "Script: $scriptname - $($0 run $argument $scriptname aboutme)"
-					fi
-				    done
-				fi
-				if [ $(ls "$workingdir/$argument/.$(basename $0)/" 2>/dev/null | grep ^depends | wc -w) -gt 0 ]
-				then
-				    for dependency in $(eval ls "$workingdir/$argument/.$(basename $0)/depends-"* 2>/dev/null )
-				    do
-					echo "Depends on: $(echo $dependency|cut -f 2- -d "-")"
-				    done
-				fi
-			    elif [ -d "$projdbdir"/[1-3]."$argument" ]
-			    then
-				if [ -r "$projdbdir"/[1-3]."$argument/README" ]
-				then
-				    head -n 1 "$projdbdir"/[1-3]."$argument"/"README"
-				else
-				    echo "You didn't provide a README file for \"$argument\" yet!"
-				fi
-				if [ -f "$projdbdir/"[1-3]."$argument/TODO" ]
-				then
-				    echo "Tasks: $(grep ^"*\ TODO" "$projdbdir/"[1-3]."$argument/TODO" | wc -l) listed."
-				    echo "Next task: $(grep ^"*\ TODO" "$projdbdir/"[1-3]."$argument/TODO" | cut -f 3- -d " " | head -n 1)"
-				else
-				    echo "Tasks: You didn't provide a TODO file for \"$(basename $argument)\" yet!"				    
-				    echo "Next task: You didn't provide a TODO file for \"$(basename $argument)\" yet!"				    
-				fi
-				if [ $(ls "$projdbdir"/[1-3]."$argument"/."$(basename $0)/" 2>/dev/null | grep .sh$ | wc -w) -gt 0 ]
-				then
-				    for script in $(eval ls "$projdbdir"/[1-3]."$argument"/."$(basename $0)"/*.sh 2>/dev/null )
-				    do
-					if [ -x $script ]
-					then
-					    scriptname=$(basename $script .sh)
-					    echo "Script: $scriptname - $($0 run $argument $scriptname aboutme)"
-					fi
-				    done
-				fi
-				if [ $(ls "$projdbdir/"[1-3]."$argument/.$(basename $0)/" 2>/dev/null | grep ^depends- | wc -w) -gt 0 ]
-				then
-				    for dependency in $(ls "$projdbdir/"[1-3]."$argument/.$(basename $0)/depends-"* 2>/dev/null )
-				    do
-					echo "Depends on: $(echo $dependency|cut -f 2- -d "-")"
-				    done
-				fi
- 			    fi
-			    echo
-			fi
-		esac
-	    done
-	fi
-	;;
-
     do)
-	if ([ -z "$2" ] || [ -n "$3" ])
+        [ -z "$2" ] || [ -n "$3" ] && { printhelpmessage; exit 1; }
+	if
+	    [ "$(getprojectcategory "$2" )" = "$workingcategoryname" ]
 	then
-	    printhelpmessage
-	    exit 1
+	    runshell "$2"
+	elif [ "$(getprojectcategory "$2" )" = "" ]
+	then
+	    echo "$2": Not found.
+	    return 1
 	else
-	    if [ -d "$projdbdir"/[1-3]."$2" ]
-	    then
-		mv "$projdbdir"/[1-3]."$2" "$workingdir"/"$2"
-		clear
-		$0 about "$2"
-	    elif [ -d "$workingdir"/"$2" ]
-	    then
-		echo "You are already working on \"$2\"".
-	    else
-		echo "Sorry, cannot find \"$2\"!"
-	    fi
+	    moveproject "$2" "$workingcategoryname"
+	    runshell "$2"
 	fi
 	;;
 
     done)
-	if [ -z "$2" ] || [ -n "$3" ]
-	then
-	    printhelpmessage
-	    exit 1
-	else
-	    if [ -d "$projdbdir"/[1-3]."$2" ]
+	[ -z "$2" ] &&  { printhelpmessage; exit 1; }
+	shift
+	returnvalue=0
+	for project in $@
+	do
+	    if [ "$(getid $project)" != "project" ]
 	    then
-		echo "You can only archive projects you're currently working on (in $workingdir)."
-		exit 1
-	    elif [ -d "$workingdir"/"$2" ]
-	    then 
-		timestamp=$(date +%Y-%m-%d)
-		if [ -f "$backupsdir"/$timestamp."$2".tbz ]
-		then
-		    echo "You already archived \"$2\" today. You'll have to rename the project or (re)move the backup."
-		    exit 1
-		fi
-		cd "$workingdir"
-		tar -cjf "$backupsdir"/$timestamp."$2".tbz "$2" && rm -fr "$workingdir"/"$2"
-		cd - >/dev/null
+		echo "$project: Not found."
+		returnvalue=1
+	    elif [ "$(getprojectcategory $project)" != "$workingcategoryname" ]
+	    then
+		printf "$project: "
+		printonlyonworking
+		returnvalue=1
+	    elif [ -f "$archivesdir"/$(gettimestamp)."$project".* ]
+	    then
+		echo "$project: already archived today. Rename the project or deal with the archive."
+		returnvalue=1
 	    else
-		printhelpmessage
-		exit 1
+		archiveproject "$project" || returnvalue=1
+		[ $? -eq 0 ] && killproject "$project"
 	    fi
-	fi
+	done
+	return $returnvalue    
+	;;
+
+    easteregg|egg)
+	echo "You have $(for category in $(listcategories); do listcategoryprojects "$category"; done|wc -l) projects in $(listcategories|wc -l) categories!"
+	return 0
+	;;
+
+    find)
+	[ -z "$2" ] && { printhelpmessage; exit 1; }
+	shift
+	expression="$@"
+	for category in $(listcategories)
+	do
+	    for project in $(listcategoryprojects $category)
+	    do
+		findinproject $project ${expression}
+	    done
+	done
+	;;
+
+    fix)
+	[ -z "$2" ] && { printhelpmessage; exit 1; }
+	shift
+	for project in "$@"
+	do
+	    fixproject $project || returnvalue=1n
+	done
+	return $returnvalue
+        ;;
+
+    help)
+	printhelpmessage
+	[ -n "$2" ] && return 1 || return 0
 	;;
 
     kill)
-	if [ -z "$2" ]||[ -n "$3" ]
-	then
-	    printhelpmessage
-	    exit 1
-	else
-	    if [ -d "$workingdir"/"$2" ]
+	[ -z "$2" ] && { printhelpmessage; exit 1; }
+	shift
+	returnvalue=0
+	for project in $@
+	do
+	    category="$(getprojectcategory "$project")"
+	    if [ "$category" = "$workingcategoryname" ]
 	    then
-		echo "Removing \""$2"\" from "$workingdir"."
-		read -p "Sure?! (y/N) " answer
-		if [ x"$answer" = "xY" ] || [ x"$answer" = "xy" ]
-		then
-		    rm -fr "$workingdir"/"$2"
-		else
-		    echo "Wise moove!"
-		fi
+		echo "Remove $project permanently? (y/N) "
+		askuseryn && { killproject "$project"; [ $? -eq 0 ] || returnvalue=1 ; } || echo "Whize decision!"
+	    elif [ "$category" = "" ]
+	    then
+		echo "$project: Not found."
+		returnvalue=1
 	    else
-		echo "You can only kill a project you are currently working on (in $workingdir)."
-		exit 1
+		printonlyonworking
+		returnvalue=1
 	    fi
-	fi
+	done
+	return $returnvalue
+	;;
+
+    killcategory)
+	[ -z "$2" ] && { printhelpmessage; exit 1; }
+	shift
+	returnvalue=0
+	for category in $@
+	do
+	    if [ "$(getcategoryname "$category")" = "$workingcategoryname" ]
+	    then
+		echo "$category: Cannot kill your working category."
+		returnvalue=1
+	    elif [ "$(getid "$category")" != "category" ]
+	    then
+		echo "$category: Not found."
+		returnvalue=1
+	    else
+		categorydir="$(getcategorydir "$category")"
+		[ -z "$(ls -A $categorydir)" ] && { killcategory "$category"; [ $? -eq 0 ] || returnvalue=1 ; }  || { echo "$category: Not empty."; returnvalue=1; }
+	    fi
+	done
+	return $returnvalue
 	;;
 
     list|ls)
-	case "$2" in
-	    $category0number|$category0name)
-	    echo "* $category0name:"
-	    [ "$columnformat" = "Yes" ] && ls "$workingdir" | column || ls "$workingdir" -1
-	    ;;
-	    $category1number|$category1name)
-	    echo "* $category1name:"
-	    [ "$columnformat" = "Yes" ] && ls "$projdbdir" | grep "^$category1number." | cut -f 2- -d "." | column || ls "$projdbdir" | grep "^$category1number." | cut -f 2- -d "."
-	    ;;
-	    $category2number|$category2name)
-	    echo "* $category2name:"
-	    [ "$columnformat" = "Yes" ] && ls "$projdbdir" | grep "^$category2number." | cut -f 2- -d "." | column || ls "$projdbdir" | grep "^$category2number." | cut -f 2- -d "."
-	    ;;
-	    $category3number|$category3name)
-	    echo "* $category3name:"
-	    [ "$columnformat" = "Yes" ] && ls "$projdbdir" | grep "^$category3number." | cut -f 2- -d "." | column || ls "$projdbdir" | grep "^$category3number." | cut -f 2- -d "."
-	    ;;
-	    "")
-		echo "* $category3name:"
-		[ "$columnformat" = "Yes" ] && ls "$projdbdir" | grep "^$category3number." | cut -f 2- -d "." | column || ls "$projdbdir" | grep "^$category3number." | cut -f 2- -d "."
-		echo ""
-		echo "* $category2name:"
-		[ "$columnformat" = "Yes" ] && ls "$projdbdir" | grep "^$category2number." | cut -f 2- -d "." | column || ls "$projdbdir" | grep "^$category2number." | cut -f 2- -d "."
-		echo ""
-		echo "* $category1name:"
-		[ "$columnformat" = "Yes" ] && ls "$projdbdir" | grep "^$category1number." | cut -f 2- -d "." | column || ls "$projdbdir" | grep "^$category1number." | cut -f 2- -d "."
-		echo ""
-		echo "* $category0name:"
-		[ "$columnformat" = "Yes" ] && ls "$workingdir" | column || ls "$workingdir" -1
-		;;
-	    *)
-		printhelpmessage
-		exit 1
-	esac
+	if [ -z "$2" ]
+	then
+	    for category in $(listcategories)
+	    do
+		echo
+		echo "[$category]"
+		listcategoryprojects $category
+	    done
+	    return 0
+	else
+	    shift
+	    returnvalue=0
+	    for category in $@
+	    do
+		if [ -z "$(getcategoryname $category)" ]
+		then
+		    echo
+		    echo "$category: Not found."
+		    returnvalue=1
+		else
+		    echo
+		    listcategoryprojects $category
+		fi
+	    done
+	    return $returnvalue
+	fi
+	;;
+
+    listarchives|lsa)
+	[ -n "$2" ] && { printhelpmessage; exit 1; }
+	listarchives && return 0
+	;;
+
+    listcategories|lsc)
+	[ -n "$2" ] && { printhelpmessage; exit 1; }
+	listcategories
+	return $?
+	;;
+
+    listprojects|lsp)
+	if [ -z "$2" ]
+	then
+	    for category in $(listcategories)
+	    do
+		listcategoryprojects "$category"
+	    done
+	    return 0
+	else
+	    shift
+	    returnvalue=0
+	    for category in $@
+	    do
+		listcategoryprojects "$category"
+		[ $? -eq 0 ] || returnvalue=1
+	    done
+	    return $returnvalue
+	fi
 	;;
 
     move|mv)
-	if ([ -z "$2" ] || [ -z "$3" ] || [ -n "$4" ])
-	then
-	    printhelpmessage
-	    exit 1
-	elif ([ ! -d "$workingdir/$2" ] && [ ! -d "$projdbdir/"[1-3]".$2" ])
-	then
-	    echo "Sorry, cannot find \"$2\"!"
-	    exit 1
-	elif [ -f "$workingdir/$2/.hidden" ]
-	then
-	    printstandardproject
-	else
-	    case "$3" in
-		$category0number|$category0name)
-		if [ -d "$projdbdir"/[1-3]."$2" ]
-		then
-		    mv "$projdbdir"/[1-3]."$2" "$workingdir"/"$2"
-		else
-		    [ -d "$workingdir"/"$2" ] && echo "\"$2\" is already in \""$category0name"\"."; exit 1
-		fi
-		;;
-		$category1number|$category1name)
-		if [ -d "$projdbdir"/[23]."$2" ]
-		then
-		    mv "$projdbdir"/[23]."$2" "$projdbdir"/1."$2"
-		elif [ -d "$workingdir"/"$2" ]
-		then
-		    mv "$workingdir"/"$2" "$projdbdir"/1."$2"
-		else
-		    [ -d "$projdbdir"/1."$2" ] && echo "\"$2\" is already in \""$category1name"\"."; exit 1
-		fi
-		;;
-		$category2number|$category2name)
-		if [ -d "$projdbdir"/[13]."$2" ]
-		then
-		    mv "$projdbdir"/[13]."$2" "$projdbdir"/2."$2"
-		elif [ -d "$workingdir"/"$2" ]
-		then
-		    mv "$workingdir"/"$2" "$projdbdir"/2."$2"
-		else
-		    [ -d "$projdbdir"/2."$2" ] && echo "\"$2\" is already in \""$category2name"\"."; exit 1
-		fi
-		;;
-		$category3number|$category3name)
-		if [ -d "$projdbdir"/[12]."$2" ]
-		then
-		    mv "$projdbdir"/[12]."$2" "$projdbdir"/3."$2"
-		elif [ -d "$workingdir"/"$2" ]
-		then
-		    mv "$workingdir"/"$2" "$projdbdir"/3."$2"
-		else
-		    [ -d "$projdbdir"/3."$2" ] && echo "\"$2\" is already in \""$category3name"\"."; exit 1
-		fi
-		;;
-		*)
-		printhelpmessage
-		exit 1
-	    esac
-	fi
+	[ "$(getid "$2")" != "project" ] || [ "$(getid "$3")" != "category" ] || [ -n "$4" ] && { printhelpmessage; exit 1; }
+	origin="$(getcategorydir "$(getprojectcategory "$2")")"
+	destiny="$(getcategorydir "$3")"
+	[ "$origin" = "$destiny" ] && { echo "$2 already in $(getcategoryname "$3")."; return 1; }
+	moveproject "$2" "$3" && return 0
 	;;
 
     new)
-	if [ -z "$2" ]
-	then
-	    read -p "Enter the name you want your project to have: " newprojectname
-	    if [ "x$newprojectname" = "x" ]
+	[ -z "$2" ] && { printhelpmessage; exit 1; }
+	shift
+	returnvalue=0
+	for project in $@
+	do
+	    if [ "$(getid "$project")" = "project" ]
 	    then
-		printhelpmessage
-		exit 1
-	    elif ([ -d "$workingdir"/"$newprojectname" ] || [ -d "$projdbdir"/[1-3]."$newprojectname" ])
-	    then
-		echo "There is already another project called \""$newprojectname"\"."
-		exit 1
-	    fi
-	    echo "Creating \""$newprojectname"\" in "$workingdir"."
-	    mkdir "$workingdir"/"$newprojectname"
-	    mkdir "$workingdir"/"$newprojectname"/trash
-	    mkdir "$workingdir"/"$newprojectname"/."$(basename "$0")"
-	    touch "$workingdir"/"$newprojectname"/README
-	    touch "$workingdir"/"$newprojectname"/TODO
-	    [ x$gitinstalled = x"Yes" ] && git init "$workingdir"/"$newprojectname"/ -q
-	    [ x$gitinstalled = x"Yes" ] && echo trash > "$workingdir"/"$newprojectname"/.gitignore
-	elif [ -n "$3" ]
-	then
-	    printhelpmessage
-	    exit 1
-	elif ([ -d "$workingdir"/"$2" ] || [ -d "$projdbdir"/[1-3]."$2" ])
-	then
-	    echo "There is already another project called \""$2"\"."
-	    exit 1
-	else
-	    echo "Creating \""$2"\" in "$workingdir"."
-	    mkdir "$workingdir"/"$2"
-	    mkdir "$workingdir"/"$2"/trash
-	    mkdir "$workingdir"/"$2"/."$(basename "$0")"
-	    touch "$workingdir"/"$2"/README
-	    touch "$workingdir"/"$2"/TODO
-	    [ x$gitinstalled = x"Yes" ] && git init "$workingdir"/"$2"/ -q
-	    [ x$gitinstalled = x"Yes" ] && echo trash > "$workingdir"/"$2"/.gitignore
-	fi
-	;;
-
-    next)
-	case $2 in
-	    *[0-9]*)
-		numberoftasks=$2
-		if [ $numberoftasks -eq 0 ]
-		then
-		    partialmessage="* Not printing any tasks for "
-		elif [ $numberoftasks -eq 1 ]
-		then
-		    partialmessage="* Next task for "
-		else
-		    partialmessage="* Next $numberoftasks tasks for "
-		fi
-		shift 2
-		;;
-	    *)
-		numberoftasks=1
-		partialmessage="* Next task for "
-		shift
-		;;
-	esac
-	if [ -z "$*" ]
-	then
-	    echo "$partialmessage""each project under \"$category0name\":"
-	    for project in $workingdir/*
-	    do
-		if [ -r $project/TODO ]
-		then
-		    echo "- $(basename $project):"
-		    grep -h -m $numberoftasks ^"*\ TODO" "$project/TODO" | cut -f 3- -d " "
-		else
-		    echo "- $(basename $project):"
-		    echo "You didn't provide a TODO file for $(basename $project) yet!"
-		fi
-	    done
-	else
-	    for project in "$@"
-	    do
-		case $project in
-		    $category0number|$category0name)
-		    echo "$partialmessage each project under \"$category0name\":"
-		    for subproject in $workingdir/*
-		    do
-			if [ -r $subproject/TODO ]
-			then
-			    echo "- $(basename $subproject):"
-			    grep -h -m $numberoftasks ^"*\ TODO" "$subproject/TODO" | cut -f 3- -d " "
-			else
-			    echo "- $(basename $subproject):"
-			    echo "You didn't provide a TODO file for $(basename $subproject) yet!"
-			fi
-		    done
-		    ;;
-		    $category1number|$category1name)
-		    echo "$partialmessage each project under \"$category1name\":"
-		    for subproject in $projdbdir/$category1number.*
-		    do
-			if [ -r $subproject/TODO ]
-			then
-			    echo "- $(basename $subproject|cut -f 2- -d "."):"
-			    grep -h -m $numberoftasks ^"*\ TODO" "$subproject/TODO" | cut -f 3- -d " "
-			else
-			    echo "- $(basename $subproject|cut -f 2- -d "."):"
-			    echo "You didn't provide a TODO file for $(basename $subproject|cut -f 2- -d ".") yet!"
-			fi
-		    done
-		    ;;
-		    $category2number|$category2name)
-		    echo "$partialmessage each project under \"$category2name\":"
-		    for subproject in $projdbdir/$category2number.*
-		    do
-			if [ -r $subproject/TODO ]
-			then
-			    echo "- $(basename $subproject|cut -f 2- -d "."):"
-			    grep -h -m $numberoftasks ^"*\ TODO" "$subproject/TODO" | cut -f 3- -d " "
-			else
-			    echo "- $(basename $subproject|cut -f 2- -d "."):"
-			    echo "You didn't provide a TODO file for $(basename $subproject|cut -f 2- -d ".") yet!"
-			fi
-		    done
-		    ;;
-		    $category3number|$category3name)
-		    echo "$partialmessage each project under \"$category3name\":"
-		    for subproject in $projdbdir/$category3number.*
-		    do
-			if [ -r $subproject/TODO ]
-			then
-			    echo "- $(basename $subproject|cut -f 2- -d "."):"
-			    grep -h -m $numberoftasks ^"*\ TODO" "$subproject/TODO" | cut -f 3- -d " "
-			else
-			    echo "- $(basename $subproject|cut -f 2- -d "."):"
-			    echo "You didn't provide a TODO file for $(basename $subproject|cut -f 2- -d ".") yet!"
-			fi
-		    done
-		    ;;
-		    *)
-			if [ -r "$projdbdir/"[1-3]".$project/TODO" ]
-			then
-			    echo "* $(basename "$projdbdir/"[1-3]".$project/"|cut -f 2- -d "."):"
-			    grep -h -m $numberoftasks ^"*\ TODO" "$projdbdir/"[1-3]".$project/TODO" | cut -f 3- -d " "
-			elif [ -r "$workingdir/$project/TODO" ]
-			then
-			    echo "* $(basename "$workingdir/$project/"):"
-			    grep -h -m $numberoftasks ^"*\ TODO" "$workingdir/$project/TODO" | cut -f 3- -d " "
-			elif ([ ! -d "$workingdir/$project/" ] && [ ! -d "$projdbdir/"[1-3]".$project/" ])
-			then
-			    echo "Sorry, cannot find \"$project\"!"
-			else
-			    echo "* $(basename "$projdbdir/"[1-3]".$project"|cut -f 2- -d "."): "
-			    echo "You didn't provide a TODO file for $(basename $project|cut -f 2- -d ".") yet!"
-			fi
-			;;
-		esac	    
-	    done
-	fi
-	;;
-
-    rename)
-	if [ -z "$2" ] || [ -z "$3" ] || [ -n "$4" ]
-	then
-	    printhelpmessage
-	    exit 1
-	else
-	    if [ ! -d "$workingdir"/"$2" ]
-	    then
-		echo "You can only rename projects you are currently working on!"
-		exit 1
-	    elif  [ -d "$workingdir"/"$3" ] || [ -d "$projdbdir"/[1-3]."$3" ]
-	    then
-		echo "You already have a project named \"$3\"."
-		exit 1
+		echo "$project: Already exists."
+		returnvalue=1
 	    else
-		mv "$workingdir"/"$2" "$workingdir"/"$3"
+		createproject $project
+		[ $? -eq 0 ] || returnvalue=1
 	    fi
-	fi
+	done
+	return $returnvalue
 	;;
 
-    ressurrect)
-	if [ -z "$2" ] || [ -n "$3" ]
-	then
-	    printhelpmessage
-	    exit 1
-	else
-	    lastbackup=$(ls -1 "$backupsdir"/[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9]."$2".tbz 2>/dev/null | sort | tail -n 1)
-	    if [ -z "$lastbackup" ]
+    newcategory)
+	[ -z "$2" ] && { printhelpmessage; exit 1; }
+	shift
+	returnvalue=0
+	for category in $@
+	do
+	    if [ "$(getid "$category")" = "category" ]
 	    then
-		echo "Gravedigger said he knows of no burried project by that name."
-		exit 1
-	    elif [ -d "$workingdir"/"$2" ] || [ -d "$projdbdir"/[1-3]."$2" ]
-	    then
-		echo "There can be only one!"
-		exit 1
-	    elif [ ! -r "$lastbackup" ]
-	    then
-		echo "Cannot access the corpese of \"$2\"."
-		exit 1
-	    elif [ -r "$lastbackup" ]
-	    then 
-		cd "$workingdir"
-		tar -xjf "$lastbackup"
-		cd - >/dev/null
+		echo "$(getcategoryname "$category"): Already exists."
+		returnvalue=1
 	    else
-		printhelpmessage
-		exit 1
+		createcategory $category
+		[ $? -eq 0 ] || returnvalue=1
 	    fi
-	fi
+	done
+	return $returnvalue
+	;;
+
+    read)
+	[ -z "$2" ] || [ -n "$3" ] && { printhelpmessage; exit 1; }
+	[ -z $(getid "$2") ] || [ $(getid "$2") != "project" ] && { echo ""$2": Not found."; exit 1; }
+	[ ! -r $(getcategorydir $(getprojectcategory "$2"))/"$2"/README ] && { echo ""$2": README not found."; exit 1; }
+	$preferrededitor $(getcategorydir $(getprojectcategory "$2"))/"$2"/README
+	;;
+
+    redo)
+	[ -z "$2" ] && { printhelpmessage; exit 1; }
+	shift
+	returnvalue=0
+	for archive in $@
+	do
+	    if [ -z "$(ls "$archivesdir"/*."$archive".* 2>/dev/null)" ] 
+	    then
+		echo ""$archive": not found."
+		returnvalue=1
+	    else
+		unarchiveproject $archive || returnvalue=1
+	    fi
+	done
+	return $returnvalue
+	;;
+
+    rename|rn)
+	[ -z "$2" ] || [ -z "$3" ] || [ -n "$4" ] && { printhelpmessage; exit 1; }
+	[ "$(getid "$2")" != "project" ] && { printhelpmessage; exit 1; }
+	[ -n "$(getid "$3")" ] && { printhelpmessage; exit 1; }
+	renameproject "$2" "$3"
 	;;
 
     run)
-	if [ -z "$2" ] || [ -z "$3" ]
+	[ -z "$2" ] || [ -z "$3" ]  && { printhelpmessage; exit 1; }
+	[ "$(getid "$2")" != "project" ] && { echo ""$2": Not found."; exit 1; }
+	script="$(getcategorydir $(getprojectcategory "$2"))"/"$2"/.$(basename $0)/"$3".sh
+	if [ -x "$script" ]
 	then
-	    printhelpmessage
-	    exit 1
+	    shift
+	    shift
+	    shift
+	    $script "$@" && return 0
 	else
-	    if [ -d "$workingdir"/"$2" ] || [ -d "$projdbdir"/[1-3]."$2" ]
-	    then
-		if [ -x "$workingdir"/"$2"/".$(basename $0)"/"$3.sh" ]
-		then
-		    projectname=$2
-		    scriptname=$3
-		    shift
-		    shift
-		    shift
-		    "$workingdir"/"$projectname"/".$(basename $0)"/"$scriptname.sh" "$@"
-		elif [ -x "$projdbdir"/[1-3]."$2"/".$(basename $0)"/"$3.sh" ]
-		then
-		    projectname=$2
-		    scriptname=$3
-		    shift
-		    shift
-		    shift
-		    "$projdbdir"/[1-3]."$projectname"/".$(basename $0)"/"$scriptname.sh" "$@"
-		else
-		    echo "Something whent wrong. Are you sure \"$2\" has a script named \"$3.sh\"?"
-		    exit 1
-		fi
-	    else
-		printhelpmessage
-		exit 1
-	    fi
+	    echo ""$3": Not found."
+	    return 1
 	fi
+	echo ""$2": "$3": Something whent wrong!"
+	return 1
 	;;
 
-    search)
+    status|st)
 	if [ -z "$2" ]
 	then
-	    printhelpmessage
-	    exit 1
+	    categorylist="$(listcategories)"
+	    for category in $categorylist
+	    do
+		echo $(getcategorystatus $category)
+	    done
+	    for project in $(listcategoryprojects $workingcategoryname)
+	    do
+		echo ""
+		echo $project
+		getprojectstatus $project
+	    done
 	else
-	    echo "Projects named \"$2\":"
-	    ls -1 "$workingdir"|grep "$2"
-	    ls "$projdbdir"|grep "$2"
-	    echo ""
-	    echo "Projects mentioning \""$2"\":"
-	    grep "$2" "$workingdir"/*/README "$workingdir"/*/TODO "$projdbdir"/*/README "$projdbdir"/*/TODO
+	    shift
+	    returnvalue=0
+	    for argument in "$@"
+	    do
+		echo ""
+		case $(getid $argument) in
+		    project)
+			getprojectstatus "$argument" || returnvalue=1
+			;;
+		    category)
+			getcategorystatus "$argument" || returnvalue=1
+			;;
+		    *)
+			echo ""$argument": Not found."
+			returnvalue=1
+			;;
+		esac
+	    done
 	fi
-	;;
-
-    show)
-	if [ -z "$2" ]
-	then
-	    printhelpmessage
-	    exit 1
-	else
-	    if [ -d "$workingdir"/"$2" ]
-	    then
-		$displayer "$workingdir"/"$2"/README 2>/dev/null || echo "You didn't provide a README file for \"$2\" yet!"
-	    elif [ -d "$projdbdir"/[1-3]."$2" ]
-	    then
-		$displayer "$projdbdir"/[1-3]."$2"/README 2>/dev/null || echo "You didn't provide a README file for \"$2\" yet!"
-	    else
-		echo "Sorry, cannot find \"$2\"!"
-		exit 1
-	    fi
-	    
-	fi
+	return $returnvalue
 	;;
 
     todo)
-	if [ -z "$2" ]
-	then
-	    printhelpmessage
-	    exit 1
-	else
-	    if [ -d "$workingdir"/"$2" ]
-	    then
-		$displayer "$workingdir"/"$2"/TODO 2>/dev/null || echo "You didn't provide a TODO file for \"$2\" yet!"
-	    elif [ -d "$projdbdir"/[1-3]."$2" ]
-	    then
-		$displayer "$projdbdir"/[1-3]."$2"/TODO 2>/dev/null || echo "You didn't provide a TODO file for \"$2\" yet!"
-	    else
-		echo "Sorry, cannot find \"$2\"!"
-		exit 1
-	    fi
-	    
-	fi
+	[ -z "$2" ] || [ -n "$3" ]
+	[ -z $(getid "$2") ] || [ $(getid "$2") != "project" ] && { echo ""$2": Not found."; exit 1; }
+	[ ! -r $(getcategorydir $(getprojectcategory "$2"))/"$2"/TODO ] && { echo ""$2": TODO not found."; exit 1; }
+	case $preferrededitor in
+	    *"emacs"*) editorparameters="-f org-mode" ;;
+	    *) ;;
+	esac
+	$preferrededitor $(getcategorydir $(getprojectcategory "$2"))/"$2"/TODO $editorparameters
 	;;
 
     undone)
-	if [ -z "$2" ] || [ -n "$3" ]
-	then
-	    printhelpmessage
-	    exit 1
-	else
-	    lastbackup=$(ls -1 "$backupsdir"/[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9]."$2".tbz 2>/dev/null | sort | tail -n 1)
-	    if [ -z "$lastbackup" ]
+	[ -z "$2" ] && { printhelpmessage; exit 1; }
+	shift
+	returnvalue=0
+	for archive in $@
+	do
+	    if [ -z "$(ls "$archivesdir"/*."$archive".* 2>/dev/null)" ] 
 	    then
-		echo "You can only undo projects you've done and archived."
-		exit 1
-	    elif [ -d "$workingdir"/"$2" ] || [ -d "$projdbdir"/[1-3]."$2" ]
-	    then
-		echo "You already have a project named \"$2\". You have to deal with it first."
-		exit 1
-	    elif [ ! -r "$lastbackup" ]
-	    then
-		echo "Cannot read latest backup of \"$2\"."
-		exit 1
-	    elif [ -r "$lastbackup" ]
-	    then 
-		cd "$workingdir"
-		tar -xjf "$lastbackup" && rm "$lastbackup"
-		cd - >/dev/null
+		echo ""$archive": Not found."
+		returnvalue=1
 	    else
-		printhelpmessage
-		exit 1
+		unarchiveproject $archive || returnvalue=1
+		killarchive $archive || returnvalue=1
 	    fi
-	fi
+	done
+	return $returnvalue
 	;;
 
     *)
 	printhelpmessage
-	exit 1
+	return 1
 	;;
-
 esac
-exit 0
+return $?

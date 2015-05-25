@@ -1,11 +1,241 @@
+A program to help you manage your projects and your chaotic home directory.
+
+- It doesn't work!
+
+- Yes it does. We hope. :-)
+
+First thing you, really, have to do is to change the value of the variable "doneconfiguring" to "Yes" (note capitalization). Otherwize the mechanism existing to prevent you from using the script without you actually ever looking into it kicks in and prevents you from doing just that. Then it should work.
+
+You shouldn't be afraid to change the code to fit your needs. Take your medicine. Eat your vegetables. Learn the shell. Try harder.
+
+This script is called "prj", but it can be called anything you want, really. just change the name of the file. If you do that, then remember to rename the ".prj" configuration subdirectory accordingly in every project as well. More on that in a short while.
+
+We will use the "prj" default name throughout our present documentation effort.
+
+The whole idea is that you keep your work organised in projects in your home directory. Each project in it's own directory, placed himself in special directories corresponding to categories.
+
+If you dare to look inside the script (and you really should, as we discussed before), you'll notice there is a place to name the directory that will be hosting your current projects (the working category). Another directory will host all other categories, containing, themselves, other projects. Each project is, itself, a directory with some standard content inside to make the project manageable by the script.
+
+Here's the required asciiart example:
+
+ ~\
+[-] Desktop
+ |  [-] Current_project_1\
+ |   |  [+] .git\
+ |   |  [+] .prj\
+ |   |   |  README
+ |   |   |  TODO
+ |   |   \  trash\
+ |  [+] Current_project_2\
+[-] Projects\
+ |  [-] 1.Category_1\
+ |   |  [+] a_delayed_project\
+ |   |  [+] another_delayed_project\
+ |   \  [+] third_one\
+ |  [-] 2.Category_2\
+ |   |  [+] An_extra_delayed_project\
+ |   \  [+] Never_gonna_get_to_touch_this\
+...
+
+Except for the working category, that has a virtual name and prefix, which you can assign changing the values of the variables "workingcategoryname" and "workingcategoryprefix", categories are named and prefixed after their directory names. Anything before a first dot in the name of the directory is the prefix. Anything after that is the category name. The prefix is used to sort them and as a shortname for the category. So, if you want your "VeryUrgent" category to come before "QuiteUrgent" category, and that before "NotUrgent", name the directories a.VeryUrgent, b.QuiteUrgent and c.NotUrgent, for example.
+
+You can refer to the category by it's name or by it's prefix. Which is handy, since it's short.
+
+The prefix will not, normally, be shown unless you dig manually inside the categories directory.
+
+Each category can, then, hold as many projects as you like. Use them to categorize your projects by whatever criteria you might come up with. Just choose whizelly or you'll be verry sorry very soon.
+
+By default, the working category is named "Desktop" and it's prefix is "0" (that's a zero).
+
+You can move projects from one category to another as you see fit.
+
+Projects are the "atoms" of the whole thing.
+
+Each project is a directory stored inside one of the categories. Let's take a look at what should be inside that directory.
+
+1. A ".git" subdirectory. You can delete it if you don't want the project under git. Because of git, you might also have a ".gitignore" file. You can use this file to tell git to ignore the trash directory, if you whish (see below).
+
+2. The ".prj" subdirectory. This is a configuration directory. You can use it to store a fiew items that, not being meant to be seen, are important to the behaviour of the script in relation to the particular project it is placed under.
+
+The name of this directory is ".prj" because the default name of the script is "prj". If ever you choose to rename the script something else, you have to change the name of this directory accordingly. In every ancient project. Just look for how to use the for loop in your shell's manual. New projects will have it correctly named.
+
+Inside this directory you can place scripts, meant to be runned both: by the script using the mechanism prepared for that, and manualy. For that to work, and for a nice integration with the script, the scripts must be executable files (obviously) named whatever you like but with a ".sh" extension. They must, also, print to sdtout a little self description if called with "aboutme" as first and only argument, and a help message, if that argument is "help".
+
+You can also place special files indicating the relationship the project has with other projects. The script recognizes "depends" as a dependency so far, and refuses to archive a projects that still has dependencies. The content of this files is not used by the script at the moment, so you can use it to store notes about the reason why a project might be dependent on another.
+
+You can also make use of this directory for other means you make up yourself (the idea of logs comes to mind, or new relations).
+
+It is a good idea to keep this directory under git control.
+
+3. A README file (note capitalization) just like this one, documenting your project. The first line of this file will be used as the description of your project.
+
+4. A TODO file. Used to keep track of tasks related to the project.
+
+The "TODO" file (note capitalization) is where you keep track of tasks related to the project. Each line beginning with a "*" followed by a space and one of "TODO" or "DONE" (note capitalization again) is a task to be dealt with or already done, respectively.
+
+The ressemblance with an org-mode file is not a coincidence. It is meant to be a super simplified one, so you can take advantage of the amazing work folks from the org-mode team did for us. If you never heard of it, look it up on the internet.
+
+5. A "trash" subdirectory. It's meant to store, well... trash: temporary files, notes, references to external objects... everything not truelly belonging to the product of the project it is placed under, but somehow related. You can delete it after you are done with the project (all tasks have been completed), before you archive the project, to save space, or never have it in the first place (delete it since the beginning) if that's a really simple project or if it doesn't make sense. It is not required. This is a good candidate to populate your ".gitignore" file.
+
+- Ok. So let's make use of it, then.
+
+The script accepts what we call "verbs" (they might not be actual verbs, in the grammatical sense) as it's first argument. If you don't provide a valid one, it will fail printing a standard help message to stdout.
+
+If you do provide one of the following, the script will execute as follows:
+
+1. "do" - The script will drop you in a subshell inside the directory of the project. If it is not on the working directory it will be moved there. The prompt will change to something meaningfull to the project and easylly recognizable. When you exit the subshell, some information might be provided to you and the script will terminate.
+
+2. "done" - The project entered as next argument will be packed with a timestamp prefixed to it's name and moved to the archives directory.
+
+3. "help" - The standard help message will be printed as when you do any mistake, but the script will not fail.
+
+4. "kill" - Will kill a project in the working directory by recursively deleting it's directory. You will be prompted because there is no easy way back.
+
+5. "killcategory" - Will kill an empty category by deleting it's directory.
+
+6. "list" or simply "ls" - If category names are provided as arguments only projects in said categories will be listed preceded by an empty line and the category name instide square brackets. If none is specified, all categories are listed, including the working category.
+
+7. "listcategories" or "lsc", for short - Will print the categories names. Simple.
+
+8. "listprojects" or only "lsp" - Will print all projects sorted alphabeticaly and in reverse order of categories (the one with the precedent prefix is the last one to be printed except for the working category that is allways the last to be printed).
+
+9. "move" or "mv" - Will move a project from one category to another.
+
+10. "new" - Will create a new project in your working directory with all it needs: the "README" and "TODO" files, the ".prj" and "trash" subdirectories and, if you have git, the project will be initialized and will, therefore, have a ".git" subdirectory.
+
+11. "newcategory" - Creates a new category. This one was easy.
+
+12. "read" - Will open the "README" file in your preferred text editor.
+
+13. "redo" - Will unarchive the last version of an archived project and place it in your working category. The archive will not be removed.
+
+14. "rename" or "rn" - Renames a project. Easy too.
+
+15. "run" - runs a script belonging to a given project, stored in it's ".prj" directory. You dont't include the ".sh" suffix in the name of the script when calling it using this mechanism. all remaining arguments will be passed to the script.
+
+16. "search" - Searches for the rest of the arguments as a string in the names of all projects and in the "README" and "TODO" files of all projects. Haven't I told you the for loop of your shell is awesome?
+
+17. "status" - Prints a nice overview of the current situation. If the neme of at least one project or category is provided, it will print more detailed information about that particular project(s) or categor(y|ies).
+
+18. "todo" - Will open the "TODO" file in your preferred text editor.
+
+19. "undone" - Just like redo, it will unarchive an archived project, but will remove the archive as if you had never archived it in the first place.
+
+20. In every other case, if anything else is entered in the place of the verb, the script will complain printing the standard help message and failing.
+
+Type "prj help" in your shell prompt to see the following usage syntax:
+
 Name:
 	prj - A program to help you manage your projects and your chaotic home directory.
-
+ 
 Usage:
-	prj [help]
-	prj list [<CategoryName>|<CategoryNumber>]
-	prj about|do|done|kill|new|next|show|todo|undone <Project>
-	prj move|mv <Project> <CategoryName>|<CategoryNumber>
-	prj search <ProjectName>|<Expression>
-	prj run <ProjectName> <ScriptName> [<ScriptParamenters>]
-	prj rename <ProjectInicialName> <ProjectFinalName>
+	prj [do] <projectname>
+	prj [done | fix | kill] <projectname(s)>
+	prj [help | listarchives|lsa | listcategories|lsc]
+	prj [killcategory] <categoryname(s)>
+	prj [list|ls | listprojects|lsp] [<categoryname(s)>]
+	prj [move|mv] <projectname> <categoryname>
+	prj [new] <projectname(s)>
+	prj [newcategory] <categoryname(s)>
+	prj [read | todo] <projectname>
+	prj [rename|rn] <projectname> <projectname>
+	prj [run] <projectname> <scriptname> [<scriptargument(s)]
+	prj [find] <expression>
+	prj [status|st] [<categoryname(s)>|<projectname(s)>]
+	prj [redo | undone] <archive(s)>
+
+- Here is an example usage of the script.
+
+Sheena is a punk rocker.
+
+Each of her projects is a song or a subject somehow related to the production of an album and she decides to rename the script to "composer". She opens up the script file in emacs and changes the values of some variables.
+
+$ mv ~/bin/prj ~/bin/composer
+$ emacs /home/sheena/bin/composer
+
+  workingdirname="Stage"
+  workingdirprefix="a"
+  doneconfiguring="Yes"
+
+She, then, opens her ~/.config/user-dirs.dirs file and changes the name of some default locations.
+
+$ emacs .config/user-dirs.dirs
+
+  XDG_DESKTOP_DIR="/home/sheena/Stage"
+  XDG_PROJECTS_DIR="$HOME/Garage"
+  XDG_BACKUPS_DIR="$HOME/Attic"
+
+In order to host her work on the new album, she creates a category in which she will place every music that will go into that album.
+
+$ composer newcategory b.NexAlbum
+
+She, then, starts a project for each of the musics she plans to prepare for the album.
+
+$ composer new LoveSongNot
+$ composer new DoesHumourBelongInMusic
+$ composer new MyDearBrutalDefenders
+$ composer new AnarchyInTheUK
+$ composer new title
+$ composer new cover
+$ composer new production
+
+But she will only work on "MyDearBrutalDefenders" and on the title for now.
+
+$ composer move LoveSongNot b
+$ composer mv DoesHumourBelongInMusic b
+
+And "AnarchyInTheUK" should, really, go into a covers only album she's been thinking about for a long time.
+
+$ composer newcategory c.CoversAlbum
+$ composer mv AnarchyInTheUK c
+
+The "cover" project will be a graphics project. Only a few binary files, so no need to keep it under git revision control.
+
+$ rm -fr Stage/cover/.git
+
+The "title" project will be only a single textfile with commented ideas, so there is no need for the trash directory or anything...
+
+$ rmdir Stage/title/trash
+$ touch Stage/title
+
+Of course, she will keep this one under git control. :-)
+
+$ composer ls
+
+[CoversAlbum]
+AnarchyInTheUK
+
+[NextAlbum]
+DoesHumourBelongInMusic
+LoveSongNot
+
+[Stage]
+cover
+MyDearBrutalDefenders
+production
+title
+
+What about the title for the covers only album? She can't have two projects with the same name.
+
+$ composer rename title NextAlbumTitle
+$ composer new CoversAlbumTitle
+$ rmdir Stage/CoversAlbumTitle/trash
+$ touch Stage/CoversAlbumTitle/title
+$ composer mv CoversAlbumTitle c
+$ composer ls
+
+[CoversAlbum]
+CoversAlbumTitle
+AnarchyInTheUK
+
+[NextAlbum]
+DoesHumourBelongInMusic
+LoveSongNot
+
+[Stage]
+cover
+MyDearBrutalDefenders
+production
+NextAlbumTitle
+
+:-)
