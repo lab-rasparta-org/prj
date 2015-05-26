@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html lang="en-GB" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>prj.lab.rasparta.org</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+</head>
+
+<body>
+<blockquote class="left">
+  <p class="normal">- It doesn't work!</p>
+</blockquote>
+<blockquote class="right">
+  <p class="normal">- Yes, it does. Hopefully. :-)</p>
+</blockquote>
+
+<p class="normal">First thing you, really, have to do is to change the value of the variable <span class="code">doneconfiguring</span> to <span class="code">Yes</span> (note capitalisation). Otherwise the existing mechanism to prevent you from using the script without actually ever looking into it kicks in and prevents you from doing just that. Then it should work.</p>
+
+<p class="normal">You shouldn't be afraid to change the code to fit your needs. Take your medicine. Eat your vegetables. Learn the shell. Try harder.</p>
+
+<p class="normal">This script is called <span class="code">prj</span>, but it can be called anything you want, really. Just change the name of the file. If you do that, then remember to rename the <span class="code">.prj</span> configuration subdirectory accordingly in every project as well. More on that in a short while.</p>
+
+<p class="normal">We will use the <span class="code">prj</span> default name throughout our present documentation effort.</p>
+
+<p class="normal">The whole idea is that you keep your work organised into projects in your home directory. Each project in its own directory, placed, itself, in special directories corresponding to categories.</p>
+
+<p class="normal">If you dare to look inside the script (and you really should, as we discussed before), you'll notice there is a place to name the directory that will be hosting your current projects (the working category). Another directory will host all other categories, containing, themselves, other projects. Each project is, itself, a directory with some standard content inside to make the project manageable by the script.</p>
+
+<p class="normal">Here's the required screenshot:</p>
+
+<pre>
+  <p><img src="screenshot.png" alt="home directory tree" /></p>
+</pre>
+
+<p class="normal">Except for the working category, that has a virtual name and prefix, which you can assign changing the values of the variables <span class="code">workingcategoryname</span> and <span class="code">workingcategoryprefix</span>, categories are named and prefixed after their directory names. Anything before a first dot in the name of the directory is the prefix. Anything after that is the category name. The prefix is used to sort them and as a short name for the category. So, if you want your <span class="code">VeryUrgent</span> category to come before <span class="code">QuiteUrgent</span> category, and that before <span class="code">NotUrgent</span>, name the directories <span class="code">a.VeryUrgent</span>, <span class="code">b.QuiteUrgent</span> and <span class="code">c.NotUrgent</span>, for example.</p>
+
+<p class="normal">You can refer to the category by its name or by its prefix. Which is handy, since it's short.</p>
+
+<p class="normal">The prefix will not, normally, be shown unless you dig manually inside the categories directory.</p>
+
+<p class="normal">Each category can, then, hold as many projects as you like. Use them to categorise your projects by whatever criteria you might come up with. Just choose wisely or you'll be very sorry very soon.</p>
+
+<p class="normal">By default, the working category is named <span class="code">Desktop</span> and its prefix is <span class="code">0</span> (that's a zero).</p>
+
+<p class="normal">You can move projects from one category to another as you see fit.</p>
+
+<p class="normal">Projects are the <em>atoms</em> of the whole thing.</p>
+
+<p class="normal">Each project is a directory stored inside one of the categories. Let's take a look at what should be inside that directory.</p>
+
+<p class="normal">1. A <span class="code">.git</span> subdirectory. You can delete it if you don't want the project under git. Because of git, you might also have a <span class="code">.gitignore</span> file. You can use this file to tell git to ignore the <span class="code">trash</span> directory, if you wish (see below).</p>
+
+<p class="normal">2. The <span class="code">.prj</span> subdirectory. This is a configuration directory. You can use it to store a few items that, not being meant to be seen, are important for the behaviour of the script in relation to the particular project it is placed under.</p>
+
+<p class="normal">The name of this directory is <span class="code">.prj</span> because the default name of the script is <span class="code">prj</span>. If ever you choose to rename the script something else, you have to change the name of this directory accordingly in every ancient project. Just look for how to use the for loop in your shell's manual. New projects will have it correctly named.</p>
+
+<p class="normal">Inside this directory you can place scripts, meant to be run both: by the script using the mechanism prepared for that, and manually. For that to work, and for a nice integration with the script, the scripts must be executable files (obviously) named whatever you like but with a <span class="code">.sh</span> extension. They must, also, print to <span class="code">stdout</span> a little self description if called with <span class="code">aboutme</span> as first and only argument, and a help message, if that argument is <span class="code">help</span>.</p>
+
+<p class="normal">You can also place special files indicating the relationship the project has with other projects. The script recognises any file called <span class="code">depends-&lt;projectname&gt;</span> as a dependency on that project so far, and refuses to archive a project that still has dependencies. The content of these files is not used by the script at the moment, so you can use it to store notes about the reason why a project might be dependent on another.</p>
+
+<p class="normal">You can also make use of this directory for other means you make up yourself (the idea of logs comes to mind, or new relations).</p>
+
+<p class="normal">It is a good idea to keep this directory under git control.</p>
+
+<p class="normal">3. A <span class="code">README</span> file (note capitalisation), documenting your project. The first line of this file will be used as the description of your project.</p>
+
+<p class="normal">4. A <span class="code">TODO</span> file. Used to keep track of tasks related to the project.</p>
+
+<p class="normal">The <span class="code">TODO</span> file (note capitalisation) is where you keep track of tasks related to the project. Each line beginning with a <span class="code">*</span> followed by a space and one of <span class="code">TODO</span> or <span class="code">DONE</span> (note capitalisation again) is a task to be dealt with or already done, respectively.</p>
+
+<p class="normal">The resemblance with an org-mode file is not a coincidence. It is meant to be a super simplified one, so you can take advantage of the amazing work folks from the org-mode team did for us. If you never heard of it, look it up on the Internet.</p>
+
+<p class="normal">5. A <span class="code">trash</span> subdirectory. It's meant to store, well... trash: temporary files, notes, references to external objects... everything not truly belonging to the product of the project it is placed under, but somehow related. You can delete it after you are done with the project (all tasks have been completed), before you archive the project, to save space, or never have it in the first place (delete it since the beginning) if that's a really simple project or if it doesn't make sense. It is not required. This is a good candidate to populate your <span class="code">.gitignore</span> file.</p>
+
+<p class="normal">- OK. So let's make use of it, then.</p>
+
+<p class="normal">The script accepts what we call <em>verbs</em> (they might not be actual verbs, in the grammatical sense) as its first argument. If you don't provide a valid one, it will fail printing a standard help message to <span class="code">stdout</span> and fail.</p>
+
+<p class="normal">If you do provide one of the following, the script will execute as follows:</p>
+
+<dl>
+  <dt>do</dt>
+  <dd>The script will drop you in a subshell inside the directory of the project. If it is not in the working directory it will be moved there. The prompt will change to something meaningful to the project and easily recognisable. When you exit the subshell, some information might be provided to you and the script will terminate.</dd>
+  <dt>done</dt>
+  <dd>The project entered as next argument will be packed with a timestamp prefixed to its name and moved to the archives directory.</dd>
+  <dt>find</dt>
+  <dd>Will search for a string of text in every <span class="code">REDME</span> and <span class="code">TODO</span> file.</dd>
+  <dt>fix</dt>
+  <dd>Will turn a standard directory into a valid project or try to fix an invalid one (creating the <span class="code">README</span> and <span class="code">TODO</span> files, the <span class="code">trash</span> and <span class="code">.prj</span> subdirectories and initialising the <abbr title="Version Control System">VCS</abbr>).</dd>
+  <dt>help</dt>
+  <dd>The standard help message will be printed as when you do any mistake, but the script will not fail.</dd>
+  <dt>kill</dt>
+  <dd>Will kill a project in the working directory by recursively deleting it's directory. You will be prompted because there is no easy way back.</dd>
+  <dt>killcategory</dt>
+  <dd>Will kill an empty category by deleting its directory.</dd>
+  <dt>list or ls</dt>
+  <dd>If category names are provided as arguments only projects in said categories will be listed preceded by an empty line and the category name inside square brackets. If none is specified, all categories are listed, including the working category.</dd>
+  <dt>listarchives or lsa</dt>
+  <dd>will list the projects you archived.</dd>
+  <dt>listcategories or lsc</dt>
+  <dd>Will print the categories names. Simple.</dd>
+  <dt>listprojects or lsp</dt>
+  <dd>Will print all projects sorted alphabetically and in reverse order of the categories (the one with the precedent prefix is the last one to be printed except for the working category that is always the last to be printed).</dd>
+  <dt>move or mv</dt>
+  <dd>Will move a project from one category to another.</dd>
+  <dt>new</dt>
+  <dd>Will create a new project in your working directory with all it needs: the <span class="code">README</span> and <span class="code">TODO</span> files, the <span class="code">.prj</span> and "trash" subdirectories and, if you have git, the project will be initialised and will, therefore, have a <span class="code">.git</span> subdirectory.</dd>
+  <dt>newcategory</dt>
+  <dd>Creates a new category. This one was easy.</dd>
+  <dt>read</dt>
+  <dd>Will open the <span class="code">README</span> file in your preferred text editor.</dd>
+  <dt>redo</dt>
+  <dd>Will unarchive the last version of an archived project and place it in your working category. The archive will not be removed.</dd>
+  <dt>rename or rn</dt>
+  <dd>Renames a project. Easy too.</dd>
+  <dt>run</dt>
+  <dd>runs a script belonging to a given project, stored in its <span class="code">.prj</span> directory. You don't include the <span class="code">.sh</span> suffix in the name of the script when calling it using this mechanism. All remaining arguments will be passed to the script.</dd>
+  <dt>search</dt>
+  <dd>Searches for the rest of the arguments as a string in the names of all projects and in the <span class="code">README</span> and <span class="code">TODO</span> files of all projects. Haven't I told you the for loop of your shell is awesome?</dd>
+  <dt>status</dt>
+  <dd>Prints a nice overview of the current situation. If the name of at least one project or category is provided, it will print more detailed information about that particular project(s) or categor(y|ies).</dd>
+  <dt>todo</dt>
+  <dd>Will open the <span class="code">TODO</span> file in your preferred text editor.</dd>
+  <dt>undone</dt>
+  <dd>Just like <span class="code">redo</span>, it will unarchive an archived project, but will remove the archive as if you had never archived it in the first place.</dd>
+</dl>
+
+<p class="normal">In every other case, if anything else is entered in the place of the verb, the script will complain printing the standard help message and failing.</p>
+
+<p class="normal">Type <span class="code">prj help</span> in your shell prompt to see the following help message:</p>
+
+<pre>
+<samp>
+Name:
+    prj - A program to help you manage your projects and your chaotic home directory.
+ 
+Usage:
+prj [do] &lt;projectname&gt;
+    prj [done | fix | kill] &lt;projectname(s)&gt;
+    prj [help | listarchives|lsa | listcategories|lsc]
+    prj [killcategory] &lt;categoryname(s)&gt;
+    prj [list|ls | listprojects|lsp] [&lt;categoryname(s)&gt;]
+    prj [move|mv] &lt;projectname&gt; &lt;categoryname&gt;
+    prj [new] &lt;projectname(s)&gt;
+    prj [newcategory] &lt;categoryname(s)&gt;
+    prj [read | todo] &lt;projectname&gt;
+    prj [rename|rn] &lt;projectname&gt; &lt;projectname&gt;
+    prj [run] &lt;projectname&gt; &lt;scriptname&gt; [&lt;scriptargument(s)]
+    prj [find] &lt;expression&gt;
+    prj [status|st] [&lt;categoryname(s)&gt;|&lt;projectname(s)&gt;]
+    prj [redo | undone] &lt;archive(s)&gt;
+</samp>
+</pre>
+
+</body>
+
+</html> 
