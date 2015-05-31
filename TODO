@@ -6,17 +6,10 @@ GitHub.
 * DONE Start a true open development process...
 Never stop improving on it.
 
-* TODO Now that the site is up, simplify the README file.
-Some information, like the examples, don't really belong in there.
-Also, some information might not be coincident.
-
-* TODO Fix the iframe in the homepage.
-It's trully bad design.
-
-* TODO Fix usability bug in st) verb: No need to show the name of each projects twice.
+* DONE Fix usability bug in st) verb: No need to show the name of each projects twice.
 Since printing the projects description already prints its name...
 
-* TODO Another bug in st) verb: name of categories containing an "a" will be printed simply "a".
+* DONE Another bug in st) verb: name of categories containing an "a" will be printed simply "a".
 Cannot make sense of why. At all!
 Maybe it has to do with this:
 $ echo [bcde]
@@ -27,3 +20,13 @@ $ echo [bcade]
 a
 :-/
 
+* TODO Now that the site is up, simplify the README file.
+Some information, like the examples, don't really belong in there.
+Also, some information might not be coincident.
+
+* TODO Fix the iframe in the homepage.
+It's trully bad design.
+
+* TODO Create an icon.
+Stick it on the webpage.
+Create the favicon.ico. Aply it.
