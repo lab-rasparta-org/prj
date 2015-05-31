@@ -487,7 +487,7 @@ listarchives() {
 }
 
 listcategories() {
-    ls -1r $projectsdir | cut -f 2- -d "."
+    ls -1r "$projectsdir" | cut -f 2- -d "."
     echo $workingcategoryname
 }
 
@@ -944,16 +944,15 @@ case $1 in
     status|st)
 	if [ -z "$2" ]
 	then
-	    categorylist="$(listcategories)"
-	    for category in $categorylist
+	    for category in $(listcategories)
 	    do
-		echo $(getcategorystatus $category)
+		echo ""
+		getcategorystatus "$category"
 	    done
 	    for project in $(listcategoryprojects $workingcategoryname)
 	    do
 		echo ""
-		echo $project
-		getprojectstatus $project
+		getprojectstatus "$project"
 	    done
 	else
 	    shift
