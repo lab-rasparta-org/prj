@@ -30,3 +30,11 @@ It's trully bad design.
 * TODO Create an icon.
 Stick it on the webpage.
 Create the favicon.ico. Aply it.
+
+* TODO The status verb should display project's tasks, just like it displays the project's scripts or dependencies.
+Like so:
+Task: Do this.
+Task: Do that.
+It should also print out sub-tasks. This can be achieved with a regex like the following for grep:
+grep ^'*\+\ TODO' $projectsdirectory/TODO
+Capturing one or more "*" followed by " TODO" in the beginning of a sentance.
