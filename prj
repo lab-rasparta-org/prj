@@ -395,7 +395,7 @@ getprojectstatus() {
     else
 	echo "By: $USERNAME"
     fi
-    echo "category: $(getprojectcategory "$1")"
+    echo "Category: $(getprojectcategory "$1")"
     [ -r "$projectdir"/TODO ] && { printf "Tasks: "; grep ^"*\ TODO" "$projectdir"/TODO | wc -l; } || returnvalue=1
     if [ $(ls "$projectdir"/."$(basename $0)"/ 2>/dev/null | grep .sh$ | wc -w) -gt 0 ]
     then
