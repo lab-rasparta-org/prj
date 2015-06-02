@@ -2,7 +2,7 @@ A program to help you manage your projects and your chaotic home directory.
 
 - It doesn't work!
 
-- Yes, it does. We hope. :-)
+- Yes, it does. Hopefully. :-)
 
 First thing you, really, have to do is to change the value of the variable "doneconfiguring" to "Yes" (note capitalisation). Otherwise the existing mechanism to prevent you from using the script without actually ever looking into it kicks in and prevents you from doing just that. Then it should work.
 
@@ -150,98 +150,6 @@ Usage:
 	prj [status|st] [<categoryname(s)>|<projectname(s)>]
 	prj [redo | undone] <archive(s)>
 
-- Here is an example usage of the script.
+You can learn more by going to the project's homepage:
 
-Sheena is a punk rocker.
-
-Each of her projects is a song or a subject somehow related to the production of an album and she decides to rename the script to "composer". She opens up the script file in emacs and changes the values of some variables.
-
-$ mv ~/prj/prj ~/bin/composer
-$ emacs /home/sheena/bin/composer
-
-  workingdirname="Stage"
-  workingdirprefix="a"
-  doneconfiguring="Yes"
-
-She, then, opens her ~/.config/user-dirs.dirs file and changes the name of some default locations.
-
-$ emacs .config/user-dirs.dirs
-
-  XDG_DESKTOP_DIR="/home/sheena/Stage"
-  XDG_PROJECTS_DIR="$HOME/Garage"
-  XDG_BACKUPS_DIR="$HOME/Attic"
-
-In order to host her work on the new album, she creates a category in which she will place every music that will go into that album.
-
-$ composer newcategory b.NextAlbum
-
-She, then, starts a project for each of the songs she plans to prepare for the album.
-
-$ composer new LoveSongNot
-$ composer new DoesHumourBelongInMusic
-$ composer new MyDearBrutalDefenders
-$ composer new AnarchyInTheUK
-$ composer new title
-$ composer new cover
-$ composer new production
-
-But she will only work on "MyDearBrutalDefenders" and on the title for now.
-
-$ composer move LoveSongNot b
-$ composer mv DoesHumourBelongInMusic b
-
-And "AnarchyInTheUK" should, really, go into a covers only album she's been thinking about for a long time.
-
-$ composer newcategory c.CoversAlbum
-$ composer mv AnarchyInTheUK c
-
-The "cover" project will be a graphics project. Only a few binary files, so no need to keep it under git revision control.
-
-$ rm -fr Stage/cover/.git
-
-The "title" project will be only a single text file with commented ideas, so there is no need for the trash directory or anything...
-
-$ rmdir Stage/title/trash
-$ touch Stage/title/title.org
-
-Of course, she will keep this one under git control. :-)
-
-$ composer ls
-
-[CoversAlbum]
-AnarchyInTheUK
-
-[NextAlbum]
-DoesHumourBelongInMusic
-LoveSongNot
-
-[Stage]
-cover
-MyDearBrutalDefenders
-production
-title
-
-What about the title for the covers only album? She can't have two projects with the same name.
-
-$ composer rename title NextAlbumTitle
-$ composer new CoversAlbumTitle
-$ rmdir Stage/CoversAlbumTitle/trash
-$ touch Stage/CoversAlbumTitle/title.org
-$ composer mv CoversAlbumTitle c
-$ composer ls
-
-[CoversAlbum]
-CoversAlbumTitle
-AnarchyInTheUK
-
-[NextAlbum]
-DoesHumourBelongInMusic
-LoveSongNot
-
-[Stage]
-cover
-MyDearBrutalDefenders
-production
-NextAlbumTitle
-
-=:-)
+http://prj.lab.rasparta.org/

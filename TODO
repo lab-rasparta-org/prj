@@ -23,7 +23,7 @@ a
 * DONE Fix the iframe in the homepage.
 It's trully bad design.
 
-* TODO Now that the site is up, simplify the README file.
+* DONE Now that the site is up, simplify the README file.
 Some information, like the examples, don't really belong in there.
 Also, some information might not be coincident.
 
