@@ -27,9 +27,8 @@ It's trully bad design.
 Some information, like the examples, don't really belong in there.
 Also, some information might not be coincident.
 
-* TODO Create an icon.
-Stick it on the webpage.
-Create the favicon.ico. Aply it.
+* TODO Comment the code a little bit more.
+The configuration portion is fine, but the main portion is in need of some attention.
 
 * TODO The status verb should display project's tasks, just like it displays the project's scripts or dependencies.
 Like so:
@@ -38,3 +37,8 @@ Task: Do that.
 It should also print out sub-tasks. This can be achieved with a regex like the following for grep:
 grep ^'*\+\ TODO' $projectsdirectory/TODO
 Capturing one or more "*" followed by " TODO" in the beginning of a sentance.
+Although... Why list subtasks if parent task is unfinished anyway?...
+
+* TODO Create an icon.
+Stick it on the webpage.
+Create the favicon.ico. Aply it.
