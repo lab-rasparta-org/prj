@@ -67,7 +67,7 @@ doneconfiguring="No"
 ## FUNCTIONS
 #  Here's how I work:
 
-archiveproject() {
+archiveproject() { # Archives a project.
 [ -z "$1" ] && return 1
 local command
 local destination
@@ -117,7 +117,7 @@ unset destination
 return $returnvalue
 }
 
-askuseryn() {
+askuseryn() { # Asks the user for input. Returns 0 if input is "y" or "Y".
     read answer
     case $answer in
 	y|Y)
@@ -129,7 +129,7 @@ askuseryn() {
     esac
 }
 
-checkconfiguration() {
+checkconfiguration() { # Checks to see if variable "doneconfiguring" is "Yes".
     if [ "$doneconfiguring" != "Yes" ]
     then
 	cat << EOF
@@ -142,7 +142,7 @@ EOF
     fi
 }
 
-checkvcs() {
+checkvcs() { # If VCS is not "none", checks if it's available.
     if [ "$preferredvcs" = "none" ]
     then
 	return 0
@@ -152,7 +152,7 @@ checkvcs() {
     fi
 }
 
-checkfundamentalprograms() {
+checkfundamentalprograms() { # Searches for fundamental programs. Returns false if one is missing.
     local returnvalue
     returnvalue=0
     [ $(which which 2>/dev/null) ] || { echo "Cannot find which command."; returnvalue=1; }
@@ -172,7 +172,7 @@ EOF
     return $returnvalue
 }
 
-createcategory() {
+createcategory() { # Creates a category.
     local newcategoryname
     local newcategoryprefix
     newcategoryprefix="$(echo "$1"|cut -s -f 1 -d '.')"
@@ -196,7 +196,7 @@ createcategory() {
     unset newcategoryprefix
 }
 
-createproject() {
+createproject() { # Creates a project.
     [ -z "$1" ] && return 1
     local returnvalue
     returnvalue=0
@@ -220,7 +220,7 @@ createproject() {
     return $returnvalue
 }
 
-findinproject() {
+findinproject() { # Searches for a string in a given project.
     [ -z "$2" ] && return 1
     local expression
     local project
@@ -237,7 +237,7 @@ findinproject() {
     unset match
 }
 
-fixproject() {
+fixproject() { # Turns an ordinary directory into a propper project.
     [ -z "$1" ] && return 1
     returnvalue=0
     [ -f $(getcategorydir $(getprojectcategory "$1"))/"$1"/README ] || echo ""$1" has not yet been described." > $(getcategorydir $(getprojectcategory "$1"))/"$1"/README || returnvalue=1
@@ -257,7 +257,7 @@ fixproject() {
     return $returnvalue
 }
 
-getarchivetimestamp() {
+getarchivetimestamp() { # Ecoes the latest version of an archived project.
     [ -z "$1" ] && return 1
     local archive
     local archivedate
@@ -272,7 +272,7 @@ getarchivetimestamp() {
     return 0
 }
 
-getcategorydir() {
+getcategorydir() { # Outputs the directory name of a given category.
     [ -z "$1" ] && return 1
     local dir
     if [ "$1" = "$workingcategoryprefix" ] || [ "$1" = "$workingcategoryname" ] || [ "$1" = "$workingcategoryprefix.$workingcategoryname" ]
@@ -289,7 +289,7 @@ getcategorydir() {
     return 0
 }
 
-getcategoryname() {
+getcategoryname() { # Echoes the name of a category given by its prefix, name or prefix.name.
     [ -z "$1" ] && return 1
     local dir
     if [ "$1" = "$workingcategoryprefix" ] || [ "$1" = "$workingcategoryname" ] || [ "$1" = "$workingcategoryprefix.$workingcategoryname" ]
@@ -306,7 +306,7 @@ getcategoryname() {
     return 0
 }
 
-getcategoryprefix() {
+getcategoryprefix() { # Echoes the prefix of a category given by its prefix, name or prefix.name.
     [ -z "$1" ] && return 1
     local dir
     if [ "$1" = "$workingcategoryprefix" ] || [ "$1" = "$workingcategoryname" ] || [ "$1" = "$workingcategoryprefix.$workingcategoryname" ]
@@ -323,13 +323,13 @@ getcategoryprefix() {
     return 0
 }
 
-getcategorystatus() {
+getcategorystatus() { # Prints the prefix.name, and number of projects in category.
     [ -z "$1" ] && return 1
     echo "[$(getcategoryname "$1")]\nprefix: $(getcategoryprefix "$1")\nprojects: $(listcategoryprojects "$1" | wc -l)"
     return 0
 }
 
-gethomesetup() {
+gethomesetup() { # Fills the values of projectsdir, workingcategorydir and archivesdir with configured values or tryes to create them with default values.
     local returnvalue
     returnvalue=0
     [ -r ~/.config/user-dirs.dirs ] && . ~/.config/user-dirs.dirs
@@ -348,7 +348,7 @@ gethomesetup() {
     return $returnvalue
 }
 
-getid() {
+getid() { # Is this a project or a category?
     [ -z "$1" ] && return 1
     [ -d "$workingcategorydir"/$1 ] && { echo "project"; return 0; }
     [ -d "$projectsdir"/*/"$1" ] && { echo "project"; return 0; }
@@ -360,7 +360,7 @@ getid() {
     return 1
 }
 
-getpreferredcompressor() {
+getpreferredcompressor() { # Which is the preferred compressor?
     if [ -z "$preferredcompressor" ]
     then
 	preferredcompressor=$(basename $(which bzip2)) || preferredcompressor=$(basename $(which gzip)) || preferredcompressor=$(basename $(which xz)) || preferredcompressor=$(basename $(which compress)) || preferredcompressor=$(basename $(which lzop)) || preferredcompressor="none"
@@ -368,7 +368,7 @@ getpreferredcompressor() {
     [ -n "$preferredcompressor" ] && return 0 || return 1
 }
 
-getpreferrededitor() {
+getpreferrededitor() { # Which is the preferred editor?
     if [ -z "$preferrededitor" ]
     then
 	preferrededitor=$(which $EDITOR) || preferrededitor=$(which editor) || preferrededitor=$(which emacs) || preferrededitor=$(which vi) || preferrededitor=$(which vim) || preferrededitor=$(which nano) || unset preferrededitor
@@ -376,14 +376,14 @@ getpreferrededitor() {
     [ -n "$preferrededitor" ] && return 0 || return 1
 }
 
-getprojectcategory() {
+getprojectcategory() { # What category is a given project in?
     [ -z "$1" ] && return 1
     [ -d "$workingcategorydir"/"$1" ] && { echo "$workingcategoryname"; return 0; }
     [ -d "$projectsdir"/*/"$1" ] && { echo "$(basename $(dirname $(echo "$projectsdir"/*/"$1")) | cut -f 2 -d "." )"; return 0; }
     return 1
 }
 
-getprojectstatus() {
+getprojectstatus() { # Prints a report of a projects status.
     [ -z "$1" ] && return 1
     local projectdir
     projectdir="$(getcategorydir $(getprojectcategory "$1"))/"$1""
@@ -421,11 +421,11 @@ getprojectstatus() {
     return $returnvalue
 }
 
-gettimestamp() {
+gettimestamp() { # Echoes a timestamp of current time.
     echo "$(date +%Y-%m-%d)"
 }
 
-killarchive() {
+killarchive() { # Deletes an archived project.
 [ -z $1 ] && return 1
 local archive
 local returnvalue
@@ -464,7 +464,7 @@ unset archive
 return $returnvalue
 }
 
-killcategory() {
+killcategory() { # Removes an entire category!
     [ -z "$1" ] && return 1
     local categoryname
     categoryname="$(getcategoryname "$1")"
@@ -476,23 +476,23 @@ killcategory() {
     [ -d "$categorydir" ] && return 1 || return 0    
 }
 
-killproject() {
+killproject() { # Removes a project!
     [ -z "$1" ] && return 1
     rm -fr "$workingcategorydir"/"$1"
     [ -d "$workingcategorydir"/"$1" ] && return 1 || return 0
 }
 
-listarchives() {
+listarchives() { # Lists archived projects.
     ls -1 $archivesdir && return 0
     return 1
 }
 
-listcategories() {
+listcategories() { # Lists all the category names. Excludes the prefixes.
     ls -1r "$projectsdir" | cut -f 2- -d "."
     echo $workingcategoryname
 }
 
-listcategoryprojects() {
+listcategoryprojects() { # List all projects of a given category.
     [ -z "$1" ] && return 1
     local dir
     dir=$(getcategorydir $1)
@@ -502,7 +502,7 @@ listcategoryprojects() {
     return 0
 }
 
-moveproject() {
+moveproject() { # Moves a project to another category.
     local origin
     local destiny
     origin="$(getcategorydir "$(getprojectcategory "$1")")"
@@ -515,7 +515,7 @@ moveproject() {
     unset destiny
 }
 
-printhelpmessage() {
+printhelpmessage() { # Prints the standard help message.
     cat << EOF
 Name:
 	$(basename $0) - A program to help you manage your projects and your chaotic home directory.
@@ -539,13 +539,13 @@ Usage:
 EOF
 }
 
-printonlyonworking() {
+printonlyonworking() { # Prints a message for when trying to do something to a project not in the working category directory.
     cat <<EOF
 You can only do that on projects you are currently working on (under $workingcategoryname).
 EOF
 }
 
-printstandardproject () {
+printstandardproject () { # Prints a message for when trying to move a project away form the working category directory that has a .hidden file in it.
 	    cat << EOF
 This project doesn't seem to be suitable for moving away from your working directory.
 It has a .hidden file in it meaning it is meant to stay in there and look pretty.
@@ -554,13 +554,13 @@ If this is not the case, remove the file and try again.
 EOF
 }
 
-renameproject() {
+renameproject() { # Gives a project a new name.
 [ -z "$1" ] || [ -z "$2" ] && return 1
 mv $(getcategorydir $(getprojectcategory "$1"))/"$1"  $(getcategorydir $(getprojectcategory "$1"))/"$2" && return 0
 return 1
 }
 
-runshell() {
+runshell() { # Opens a subshell in the projects directory with a specially crafted environment for development of the project.
     [ -z "$1" ] && return 1
     if [ "$(basename $SHELL)" = "bash" ]
     then
@@ -594,7 +594,7 @@ EOF
     fi
 }
 
-unarchiveproject() {
+unarchiveproject() { # Extracts the archived project into the working category directory.
 [ -z $1 ] && return 1
 local command
 local origin
@@ -667,8 +667,8 @@ gethomesetup || exit 1
 
 ## MAIN
 #  Let's work, then...
-case $1 in
-    do)
+case $1 in # If $1 is:
+    do) # Moves the project to the working category, if not there, and opens a subshell in its directory.
         [ -z "$2" ] || [ -n "$3" ] && { printhelpmessage; exit 1; }
 	if
 	    [ "$(getprojectcategory "$2" )" = "$workingcategoryname" ]
@@ -684,7 +684,7 @@ case $1 in
 	fi
 	;;
 
-    done)
+    done) # Archives a project.
 	[ -z "$2" ] &&  { printhelpmessage; exit 1; }
 	shift
 	returnvalue=0
@@ -716,7 +716,7 @@ case $1 in
 	return 0
 	;;
 
-    find)
+    find) # Searches for an expression in all projects.
 	[ -z "$2" ] && { printhelpmessage; exit 1; }
 	shift
 	expression="$@"
@@ -729,7 +729,7 @@ case $1 in
 	done
 	;;
 
-    fix)
+    fix) # Turns an ordinary directory into a propper project.
 	[ -z "$2" ] && { printhelpmessage; exit 1; }
 	shift
 	for project in "$@"
@@ -739,12 +739,12 @@ case $1 in
 	return $returnvalue
         ;;
 
-    help)
+    help) # Prints the standard help message without failing.
 	printhelpmessage
 	[ -n "$2" ] && return 1 || return 0
 	;;
 
-    kill)
+    kill) # Completely whipes a project out of existence.
 	[ -z "$2" ] && { printhelpmessage; exit 1; }
 	shift
 	returnvalue=0
@@ -767,7 +767,7 @@ case $1 in
 	return $returnvalue
 	;;
 
-    killcategory)
+    killcategory) # Removes an empty category, if not the working category.
 	[ -z "$2" ] && { printhelpmessage; exit 1; }
 	shift
 	returnvalue=0
@@ -789,7 +789,7 @@ case $1 in
 	return $returnvalue
 	;;
 
-    list|ls)
+    list|ls) # Lists projects in all or given categories.
 	if [ -z "$2" ]
 	then
 	    for category in $(listcategories)
@@ -818,18 +818,18 @@ case $1 in
 	fi
 	;;
 
-    listarchives|lsa)
+    listarchives|lsa) # Lists archived projects.
 	[ -n "$2" ] && { printhelpmessage; exit 1; }
 	listarchives && return 0
 	;;
 
-    listcategories|lsc)
+    listcategories|lsc) # Lists all the categories.
 	[ -n "$2" ] && { printhelpmessage; exit 1; }
 	listcategories
 	return $?
 	;;
 
-    listprojects|lsp)
+    listprojects|lsp) # Lists all projects or just the ones in a given category.
 	if [ -z "$2" ]
 	then
 	    for category in $(listcategories)
@@ -849,7 +849,7 @@ case $1 in
 	fi
 	;;
 
-    move|mv)
+    move|mv) # Moves a project to another category.
 	[ "$(getid "$2")" != "project" ] || [ "$(getid "$3")" != "category" ] || [ -n "$4" ] && { printhelpmessage; exit 1; }
 	origin="$(getcategorydir "$(getprojectcategory "$2")")"
 	destiny="$(getcategorydir "$3")"
@@ -857,7 +857,7 @@ case $1 in
 	moveproject "$2" "$3" && return 0
 	;;
 
-    new)
+    new) # Creates a new project.
 	[ -z "$2" ] && { printhelpmessage; exit 1; }
 	shift
 	returnvalue=0
@@ -875,7 +875,7 @@ case $1 in
 	return $returnvalue
 	;;
 
-    newcategory)
+    newcategory) # Creates a new category.
 	[ -z "$2" ] && { printhelpmessage; exit 1; }
 	shift
 	returnvalue=0
@@ -893,14 +893,14 @@ case $1 in
 	return $returnvalue
 	;;
 
-    read)
+    read) # Edits the README file.
 	[ -z "$2" ] || [ -n "$3" ] && { printhelpmessage; exit 1; }
 	[ -z $(getid "$2") ] || [ $(getid "$2") != "project" ] && { echo ""$2": Not found."; exit 1; }
 	[ ! -r $(getcategorydir $(getprojectcategory "$2"))/"$2"/README ] && { echo ""$2": README not found."; exit 1; }
 	$preferrededitor $(getcategorydir $(getprojectcategory "$2"))/"$2"/README
 	;;
 
-    redo)
+    redo) # Unarchives a project and keeps the archive.
 	[ -z "$2" ] && { printhelpmessage; exit 1; }
 	shift
 	returnvalue=0
@@ -917,14 +917,14 @@ case $1 in
 	return $returnvalue
 	;;
 
-    rename|rn)
+    rename|rn) # Renames a project.
 	[ -z "$2" ] || [ -z "$3" ] || [ -n "$4" ] && { printhelpmessage; exit 1; }
 	[ "$(getid "$2")" != "project" ] && { printhelpmessage; exit 1; }
 	[ -n "$(getid "$3")" ] && { printhelpmessage; exit 1; }
 	renameproject "$2" "$3"
 	;;
 
-    run)
+    run) # Runs a given script from a given project with parameters greater than the 4th as parameters.
 	[ -z "$2" ] || [ -z "$3" ]  && { printhelpmessage; exit 1; }
 	[ "$(getid "$2")" != "project" ] && { echo ""$2": Not found."; exit 1; }
 	script="$(getcategorydir $(getprojectcategory "$2"))"/"$2"/.$(basename $0)/"$3".sh
@@ -942,7 +942,7 @@ case $1 in
 	return 1
 	;;
 
-    status|st)
+    status|st) # Prints a global status or the status of a given category or a given project.
 	if [ -z "$2" ]
 	then
 	    for category in $(listcategories)
@@ -978,7 +978,7 @@ case $1 in
 	return $returnvalue
 	;;
 
-    todo)
+    todo) # Edits the TODO file.
 	[ -z "$2" ] || [ -n "$3" ]
 	[ -z $(getid "$2") ] || [ $(getid "$2") != "project" ] && { echo ""$2": Not found."; exit 1; }
 	[ ! -r $(getcategorydir $(getprojectcategory "$2"))/"$2"/TODO ] && { echo ""$2": TODO not found."; exit 1; }
@@ -989,7 +989,7 @@ case $1 in
 	$preferrededitor $(getcategorydir $(getprojectcategory "$2"))/"$2"/TODO $editorparameters
 	;;
 
-    undone)
+    undone) # Unarchives a project and removes the archive!
 	[ -z "$2" ] && { printhelpmessage; exit 1; }
 	shift
 	returnvalue=0
@@ -1007,7 +1007,7 @@ case $1 in
 	return $returnvalue
 	;;
 
-    *)
+    *) # In every other case print the standard help and fail.
 	printhelpmessage
 	return 1
 	;;

@@ -27,7 +27,7 @@ It's trully bad design.
 Some information, like the examples, don't really belong in there.
 Also, some information might not be coincident.
 
-* TODO Comment the code a little bit more.
+* DONE Comment the code a little bit more.
 The configuration portion is fine, but the main portion is in need of some attention.
 
 * TODO The status verb should display project's tasks, just like it displays the project's scripts or dependencies.
