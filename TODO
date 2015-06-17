@@ -18,6 +18,9 @@ Make use of the propper GitHub API for that.
 * DONE Add a link to the TODO file
 Maybe on the main page.
 
+* DONE Add a link to the rss feed
+https://github.com/lab-rasparta-org/prj/commits/master.atom
+
 * TODO Fix the heigth of the iframe.
 It should stretch to the bottom of the visible page.
 It's working in some browsers, not older ones.
