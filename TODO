@@ -15,7 +15,7 @@ And the favicon in the propper section - in the <head> of the page.
 * DONE Don't download the zip file. Download the tarball.
 Make use of the propper GitHub API for that.
 
-* TODO Add a link to the TODO file
+* DONE Add a link to the TODO file
 Maybe on the main page.
 
 * TODO Fix the heigth of the iframe.
