@@ -12,8 +12,11 @@ And the favicon.
 And the favicon in the propper section - in the <head> of the page.
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 64x64" type="image/vnd.microsoft.icon">
 
-* TODO Don't download the zip file. Download the tar.gz one.
+* DONE Don't download the zip file. Download the tarball.
 Make use of the propper GitHub API for that.
+
+* TODO Add a link to the TODO file
+Maybe on the main page.
 
 * TODO Fix the heigth of the iframe.
 It should stretch to the bottom of the visible page.
