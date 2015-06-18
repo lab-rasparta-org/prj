@@ -81,7 +81,8 @@ h1 {
 }
 
 img {
-    border: 0px;
+    border-style: none;
+    border-width: 0px;
 }
 
 iframe {
@@ -89,7 +90,7 @@ iframe {
     height: 100%;
     padding: 0;
     margin: 0;
-    border: none;
+    border-style: none;
 }
 
 nav {
