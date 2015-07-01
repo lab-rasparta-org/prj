@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html lang="en-GB" xmlns="http://www.w3.org/1999/xhtml">
 
@@ -6,75 +6,75 @@
     <title>prj.lab.rasparta.org</title>
     <link rel="stylesheet" href="style.css" type="text/css" />
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-</head>
+  </head>
 
-<body>
-<h1>Sheena is a punk rocker</h1>
+  <body>
+    <h2>Sheena is a punk rocker</h2>
 
-<p class="normal">Each of her projects is a song or a subject somehow related to the production of an album and she decides to rename the script to <span class="code">composer</span>. She opens up the script file in <span class="code">emacs</span> and changes the values of some variables.</p>
+    <p class="normal">Each of her projects is a song or a subject somehow related to the production of an album and she decides to rename the script to <span class="code">composer</span>. She opens up the script file in <span class="code">emacs</span> and changes the values of some variables.</p>
 
-<p class="code">$ mv ~/prj/prj ~/bin/composer<br />
-$ emacs /home/sheena/bin/composer</p>
+    <p class="code">$ mv ~/prj/prj ~/bin/composer<br />
+      $ emacs /home/sheena/bin/composer</p>
 
-<pre>
-<samp>
+    <pre>
+      <samp>
 workingdirname="Stage"
 workingdirprefix="a"
 doneconfiguring="Yes"
-</samp>
-</pre>
+      </samp>
+    </pre>
 
-<p class="normal">She, then, opens her <span class="code">~/.config/user-dirs.dirs</span> file and changes the name of some default locations.</p>
+    <p class="normal">She, then, opens her <span class="code">~/.config/user-dirs.dirs</span> file and changes the name of some default locations.</p>
 
-<p class="code">$ emacs .config/user-dirs.dirs</p>
+    <p class="code">$ emacs .config/user-dirs.dirs</p>
 
-<pre>
-<samp>
+    <pre>
+      <samp>
 XDG_DESKTOP_DIR="/home/sheena/Stage"
 XDG_PROJECTS_DIR="$HOME/Garage"
 XDG_BACKUPS_DIR="$HOME/Attic"
-</samp>
-</pre>
+      </samp>
+    </pre>
 
-<p class="normal">In order to host her work on the new album, she creates a category in which she will place every music that will go into that album.</p>
+    <p class="normal">In order to host her work on the new album, she creates a category in which she will place every music that will go into that album.</p>
 
-<p class="code">$ composer newcategory b.NextAlbum</p>
+    <p class="code">$ composer newcategory b.NextAlbum</p>
 
-<p class="normal">She, then, starts a project for each of the songs she plans to prepare for the album.</p>
+    <p class="normal">She, then, starts a project for each of the songs she plans to prepare for the album.</p>
 
-<p class="code">$ composer new LoveSongNot<br />
-$ composer new DoesHumourBelongInMusic<br />
-$ composer new MyDearBrutalDefenders<br />
-$ composer new AnarchyInTheUK<br />
-$ composer new title<br />
-$ composer new cover<br />
-$ composer new production</p>
+    <p class="code">$ composer new LoveSongNot<br />
+      $ composer new DoesHumourBelongInMusic<br />
+      $ composer new MyDearBrutalDefenders<br />
+      $ composer new AnarchyInTheUK<br />
+      $ composer new title<br />
+      $ composer new cover<br />
+      $ composer new production</p>
 
-<p class="normal">But she will only work on <span class="code">MyDearBrutalDefenders</span> and on the title for now.</p>
+    <p class="normal">But she will only work on <span class="code">MyDearBrutalDefenders</span> and on the title for now.</p>
 
-<p class="code">$ composer move LoveSongNot b<br />
-$ composer mv DoesHumourBelongInMusic b</p>
+    <p class="code">$ composer move LoveSongNot b<br />
+      $ composer mv DoesHumourBelongInMusic b</p>
 
-<p class="normal">And <span class="code">AnarchyInTheUK</span> should, really, go into a covers only album she's been thinking about for a long time.</p>
+    <p class="normal">And <span class="code">AnarchyInTheUK</span> should, really, go into a covers only album she's been thinking about for a long time.</p>
 
-<p class="code">$ composer newcategory c.CoversAlbum<br />
-$ composer mv AnarchyInTheUK c</p>
+    <p class="code">$ composer newcategory c.CoversAlbum<br />
+      $ composer mv AnarchyInTheUK c</p>
 
-<p class="normal">The <span class="code">cover</span> project will be a graphics project. Only a few binary files, so no need to keep it under git revision control.</p>
+    <p class="normal">The <span class="code">cover</span> project will be a graphics project. Only a few binary files, so no need to keep it under git revision control.</p>
 
-<p class="code">$ rm -fr Stage/cover/.git</p>
+    <p class="code">$ rm -fr Stage/cover/.git</p>
 
-<p class="normal">The <span class="code">title</span> project will be only a single text file with commented ideas, so there is no need for the trash directory or anything...</p>
+    <p class="normal">The <span class="code">title</span> project will be only a single text file with commented ideas, so there is no need for the trash directory or anything...</p>
 
-<p class="code">$ rmdir Stage/title/trash<br />
-$ touch Stage/title/title.org</p>
+    <p class="code">$ rmdir Stage/title/trash<br />
+      $ touch Stage/title/title.org</p>
 
-<p class="normal">Of course, she will keep this one under git control. :-)</p>
+    <p class="normal">Of course, she will keep this one under git control. :-)</p>
 
-<p class="code">$ composer ls</p>
+    <p class="code">$ composer ls</p>
 
-<pre>
-<samp>
+    <pre>
+      <samp>
 [CoversAlbum]
 AnarchyInTheUK
 
@@ -87,20 +87,20 @@ cover
 MyDearBrutalDefenders
 production
 title
-</samp>
-</pre>
+      </samp>
+    </pre>
 
-<p class="normal">What about the title for the covers only album? She can't have two projects with the same name.</p>
+    <p class="normal">What about the title for the covers only album? She can't have two projects with the same name.</p>
 
-<p class="code">$ composer rename title NextAlbumTitle<br />
-$ composer new CoversAlbumTitle<br />
-$ rmdir Stage/CoversAlbumTitle/trash<br />
-$ touch Stage/CoversAlbumTitle/title.org<br />
-$ composer mv CoversAlbumTitle c<br />
-$ composer ls</p>
+    <p class="code">$ composer rename title NextAlbumTitle<br />
+      $ composer new CoversAlbumTitle<br />
+      $ rmdir Stage/CoversAlbumTitle/trash<br />
+      $ touch Stage/CoversAlbumTitle/title.org<br />
+      $ composer mv CoversAlbumTitle c<br />
+      $ composer ls</p>
 
-<pre>
-<samp>
+    <pre>
+      <samp>
 [CoversAlbum]
 CoversAlbumTitle
 AnarchyInTheUK
@@ -114,11 +114,11 @@ cover
 MyDearBrutalDefenders
 production
 NextAlbumTitle
-</samp>
-</pre>
+      </samp>
+    </pre>
 
-<p class="normal"><span class="code">=:-)</span></p>
+    <p class="normal"><span class="code">=:-)</span></p>
 
-</body>
+  </body>
 
 </html> 
