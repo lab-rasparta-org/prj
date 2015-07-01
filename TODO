@@ -15,15 +15,19 @@ And the favicon in the propper section - in the <head> of the page.
 * DONE Don't download the zip file. Download the tarball.
 Make use of the propper GitHub API for that.
 
-* DONE Add a link to the TODO file
+* DONE Add a link to the TODO file.
 Maybe on the main page.
 
-* DONE Add a link to the rss feed
+* DONE Add a link to the rss feed.
 https://github.com/lab-rasparta-org/prj/commits/master.atom
 
-* TODO Fix the heigth of the iframe.
+* DONE Fix the heigth of the iframe.
 It should stretch to the bottom of the visible page.
 It's working in some browsers, not older ones.
 
-* TODO Fix the distance of the header to the top of the visible page.
+* DONE Fix the distance of the header to the top of the visible page.
 The icon should be at the same distance form the top as it is form the left.
+
+* TODO Unfold the main page into more options.
+Like giving the option to download the tarball, the zip file or just the prj script.
+The idea would be to display an intermediary menu in which to choose what to do next. The examples page needs this badly, as soon as more content is added.
