@@ -28,6 +28,12 @@ It's working in some browsers, not older ones.
 * DONE Fix the distance of the header to the top of the visible page.
 The icon should be at the same distance form the top as it is form the left.
 
-* TODO Unfold the main page into more options.
+* DONE Unfold the main page into more options.
 Like giving the option to download the tarball, the zip file or just the prj script.
 The idea would be to display an intermediary menu in which to choose what to do next. The examples page needs this badly, as soon as more content is added.
+Also added some more options, like the option to download just the prj file or both: zip and tar files... It was a complete remake, really!
+
+* DONE Add a nice 404 page.
+not found
+8-(
+* TODO Add functionality?
