@@ -42,3 +42,7 @@ Although... Why list subtasks if parent task is unfinished anyway?...
 * TODO Create an icon.
 Stick it on the webpage.
 Create the favicon.ico. Aply it.
+
+* TODO Bug in done) verb: if compression fails, it still removes the uncompressed project!
+The user looses data!
+Dangerous!
