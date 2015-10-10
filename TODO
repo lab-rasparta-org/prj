@@ -46,3 +46,6 @@ Create the favicon.ico. Aply it.
 * TODO Bug in done) verb: if compression fails, it still removes the uncompressed project!
 The user looses data!
 Dangerous!
+
+* TODO Bug in do) verb: when using the do) verb, git complains.
+fatal: Not a git repository (or any of the parent directories): .git
