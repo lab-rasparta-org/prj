@@ -570,7 +570,6 @@ runshell() { # Opens a subshell in the projects directory with a specially craft
 	tmpbashrc=$(mktemp /tmp/XXXXXXXX)
 	cat <<EOF > $tmpbashrc
 [ -r ~/.bashrc ] && source ~/.bashrc
-alias $(basename $0)='echo "Cannot use $(basename $0) inside $(basename $0)." #'
 cd "$workingcategorydir"/"$1"
 PS1='\[\e[0;34m\]\
 [ $1 ] \
