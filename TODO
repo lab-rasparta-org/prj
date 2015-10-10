@@ -30,6 +30,11 @@ Also, some information might not be coincident.
 * DONE Comment the code a little bit more.
 The configuration portion is fine, but the main portion is in need of some attention.
 
+* DONE Bug in do) verb: when using the do) verb, git complains.
+fatal: Not a git repository (or any of the parent directories): .git
+The runshell() function was not doing wht it was supposed to do: the alias to exit was checking git status when starting the shell, not at exit time.
+The error would be fixed by adding --work-tree="$workingcategorydir"/"$1" to git status command. But would not fix the previously mentioned issue. So let's just remove the functionality for now until a real solution is found.
+
 * TODO The status verb should display project's tasks, just like it displays the project's scripts or dependencies.
 Like so:
 Task: Do this.
@@ -46,6 +51,3 @@ Create the favicon.ico. Aply it.
 * TODO Bug in done) verb: if compression fails, it still removes the uncompressed project!
 The user looses data!
 Dangerous!
-
-* TODO Bug in do) verb: when using the do) verb, git complains.
-fatal: Not a git repository (or any of the parent directories): .git
