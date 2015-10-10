@@ -569,7 +569,6 @@ runshell() { # Opens a subshell in the projects directory with a specially craft
 	[ -d "$workingcategorydir"/"$1"/.git ] && vcsvalue="g"
 	tmpbashrc=$(mktemp /tmp/XXXXXXXX)
 	cat <<EOF > $tmpbashrc
-set -o ignoreeof
 [ -r ~/.bashrc ] && source ~/.bashrc
 alias $(basename $0)='echo "Cannot use $(basename $0) inside $(basename $0)." #'
 cd "$workingcategorydir"/"$1"
