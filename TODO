@@ -47,9 +47,10 @@ grep ^'*\+\ TODO' $projectsdirectory/TODO
 Capturing one or more "*" followed by " TODO" in the beginning of a sentance.
 Although... Why list subtasks if parent task is unfinished anyway?... Decided to list only main tasks!
 
-* TODO Create an icon.
+* DONE Create an icon.
 Stick it on the webpage.
 Create the favicon.ico. Aply it.
+Done! It's not the best favicon ever, but lets use it untill something better comes along.
 
 * TODO Bug in done) verb: if compression fails, it still removes the uncompressed project!
 The user looses data!
