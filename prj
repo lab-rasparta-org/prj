@@ -562,6 +562,7 @@ return 1
 
 runshell() { # Opens a subshell in the projects directory with a specially crafted environment for development of the project.
     [ -z "$1" ] && return 1
+    cd "$workingcategorydir"/"$1"
     if [ "$(basename $SHELL)" = "bash" ]
     then
 	vcsvalue="."
@@ -570,7 +571,6 @@ runshell() { # Opens a subshell in the projects directory with a specially craft
 	tmpbashrc=$(mktemp /tmp/XXXXXXXX)
 	cat <<EOF > $tmpbashrc
 [ -r ~/.bashrc ] && source ~/.bashrc
-cd "$workingcategorydir"/"$1"
 PS1='\[\e[0;34m\]\
 [ $1 ] \
 ( $(date +%Y-%m-%d) ) \
@@ -586,7 +586,6 @@ EOF
 	bash --rcfile $tmpbashrc
 	rm $tmpbashrc
     else
-	cd "$workingcategorydir"/"$1"
 	sh
     fi
 }
