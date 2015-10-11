@@ -976,7 +976,7 @@ case $1 in # If $1 is:
 	;;
 
     todo) # Edits the TODO file.
-	[ -z "$2" ] || [ -n "$3" ]
+	[ -z "$2" ] || [ -n "$3" ] && { printhelpmessage; exit 1; }
 	[ -z $(getid "$2") ] || [ $(getid "$2") != "project" ] && { echo ""$2": Not found."; exit 1; }
 	[ ! -r $(getcategorydir $(getprojectcategory "$2"))/"$2"/TODO ] && { echo ""$2": TODO not found."; exit 1; }
 	case $preferrededitor in

@@ -35,6 +35,9 @@ fatal: Not a git repository (or any of the parent directories): .git
 The runshell() function was not doing wht it was supposed to do: the alias to exit was checking git status when starting the shell, not at exit time.
 The error would be fixed by adding --work-tree="$workingcategorydir"/"$1" to git status command. But would not fix the previously mentioned issue. So let's just remove the functionality for now until a real solution is found.
 
+* DONE Found and fixed a bug in todo) verb.
+Forgot to exit with help message if no argument was given or was given a wrong number of arguments.
+
 * TODO The status verb should display project's tasks, just like it displays the project's scripts or dependencies.
 Like so:
 Task: Do this.
