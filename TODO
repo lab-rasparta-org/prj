@@ -38,14 +38,14 @@ The error would be fixed by adding --work-tree="$workingcategorydir"/"$1" to git
 * DONE Found and fixed a bug in todo) verb.
 Forgot to exit with help message if no argument was given or was given a wrong number of arguments.
 
-* TODO The status verb should display projects tasks, just like it displays the projects scripts or dependencies.
+* DONE The status verb should display projects tasks, just like it displays the projects scripts or dependencies.
 Like so:
 Task: Do this.
 Task: Do that.
 It should also print out sub-tasks. This can be achieved with a regex like the following for grep:
 grep ^'*\+\ TODO' $projectsdirectory/TODO
 Capturing one or more "*" followed by " TODO" in the beginning of a sentance.
-Although... Why list subtasks if parent task is unfinished anyway?...
+Although... Why list subtasks if parent task is unfinished anyway?... Decided to list only main tasks!
 
 * TODO Create an icon.
 Stick it on the webpage.
