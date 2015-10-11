@@ -396,7 +396,18 @@ getprojectstatus() { # Prints a report of a projects status.
 	echo "By: $USERNAME"
     fi
     echo "Category: $(getprojectcategory "$1")"
-    [ -r "$projectdir"/TODO ] && { printf "Tasks: "; grep ^"*\ TODO" "$projectdir"/TODO | wc -l; } || returnvalue=1
+    if [ -r "$projectdir"/TODO ]
+    then
+	oldifs=$IFS
+	IFS='
+'
+	for task in $(grep ^'* TODO' "$projectdir"/TODO|cut -f 3- -d " ")
+	do
+	    echo Task: "$task"
+	done
+	IFS=$oldifs
+	unset oldifs
+    fi || returnvalue=1
     if [ $(ls "$projectdir"/."$(basename $0)"/ 2>/dev/null | grep .sh$ | wc -w) -gt 0 ]
     then
     	local script
