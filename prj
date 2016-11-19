@@ -142,16 +142,6 @@ EOF
     fi
 }
 
-checkvcs() { # If VCS is not "none", checks if it's available.
-    if [ "$preferredvcs" = "none" ]
-    then
-	return 0
-    else
-	[ $(which $preferredvcs) ] && return 0 || return 1
-	return 1
-    fi
-}
-
 checkfundamentalprograms() { # Searches for fundamental programs. Returns false if one is missing.
     local returnvalue
     returnvalue=0
