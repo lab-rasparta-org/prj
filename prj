@@ -571,36 +571,6 @@ mv $(getcategorydir $(getprojectcategory "$1"))/"$1"  $(getcategorydir $(getproj
 return 1
 }
 
-runshell() { # Opens a subshell in the projects directory with a specially crafted environment for development of the project.
-    [ -z "$1" ] && return 1
-    cd "$workingcategorydir"/"$1"
-    if [ "$(basename $SHELL)" = "bash" ]
-    then
-	vcsvalue="."
-	[ -d "$workingcategorydir"/"$1"/.hg ] && vcsvalue="m"
-	[ -d "$workingcategorydir"/"$1"/.git ] && vcsvalue="g"
-	tmpbashrc=$(mktemp /tmp/XXXXXXXX)
-	cat <<EOF > $tmpbashrc
-[ -r ~/.bashrc ] && source ~/.bashrc
-PS1='\[\e[0;34m\]\
-[ $1 ] \
-( $(date +%Y-%m-%d) ) \
-$(printf $vcsvalue)\
-$([ -d "$workingcategorydir"/"$1"/trash ] && printf "t" || printf "." )\
-$(case $(basename $preferrededitor) in emacs*) printf "e";; vi|vim) printf "v";; nano) printf "n";; cat) printf "c";; *) [ -z $(basename $preferrededitor) ] && printf "." || printf "?";; esac)\
-$(case $preferredcompressor in bzip*) printf "b";; gzip) printf "g";; xz) printf "x";; compress) printf "c";; lzip) printf "l";; lzma) printf "m";; lzop) printf "o";; none) printf ".";; *) printf "?";; esac)  \
-$(date +%H:%M)... \t\
-\n\
-\w\$ \
-\[\e[0m\]'
-EOF
-	bash --rcfile $tmpbashrc
-	rm $tmpbashrc
-    else
-	sh
-    fi
-}
-
 unarchiveproject() { # Extracts the archived project into the working category directory.
 [ -z $1 ] && return 1
 local command
@@ -675,22 +645,6 @@ gethomesetup || exit 1
 ## MAIN
 #  Let's work, then...
 case $1 in # If $1 is:
-    do) # Moves the project to the working category, if not there, and opens a subshell in its directory.
-        [ -z "$2" ] || [ -n "$3" ] && { printhelpmessage; exit 1; }
-	if
-	    [ "$(getprojectcategory "$2" )" = "$workingcategoryname" ]
-	then
-	    runshell "$2"
-	elif [ "$(getprojectcategory "$2" )" = "" ]
-	then
-	    echo "$2": Not found.
-	    return 1
-	else
-	    moveproject "$2" "$workingcategoryname"
-	    runshell "$2"
-	fi
-	;;
-
     done) # Archives a project.
 	[ -z "$2" ] &&  { printhelpmessage; exit 1; }
 	shift
