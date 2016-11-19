@@ -17,7 +17,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## CONFIGURATION
+## INITIALIZATION
+#  Let's set up an appropriete environment for myself...
+ 
+### CONFIGURATION
 #  Configure me here
 # Where do you want your stuff? If you leave this as is, I'll try to get the proper values from the environment.
 # Otherwise I'll just use default values, hoping they're ok for you. I can make mistakes, though.
@@ -58,13 +61,10 @@ preferrededitor="emacs23-nox"
 # Are you done with the configurations above? If so, change next variable to "Yes" (note capitalization!).
 doneconfiguring="No"
 
-## CONFIGURATION END
+### CONFIGURATION END
 #  Stop configuring, your job is done here. Go use me and be marry.
  
-## INITIALIZATION
-#  Let's set up an appropriete environment for myself...
- 
-## FUNCTIONS
+### FUNCTIONS
 #  Here's how I work:
 
 archiveproject() { # Archives a project.
@@ -629,6 +629,8 @@ checkfundamentalprograms || exit 1
 # Have you configured your freedesktop propperly?
 gethomesetup || exit 1
  
+### FUNCTIONS END
+
 ## INITIALIZATION END
 #  Should be all set now.
 
@@ -964,3 +966,4 @@ case $1 in # If $1 is:
 	;;
 esac
 return $?
+## MAIND END
