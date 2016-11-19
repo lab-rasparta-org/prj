@@ -70,19 +70,13 @@ case $1 in
     *)
 	OLD_IFS=$IFS
 	IFS=':'
-	for dir in $PATH
-	do
-	    if [ -w $dir ]
-	    then
-		cp -i $(dirname $0)/../$originalscriptname $dir && exit 0
-	    fi
-	done
 	pathdirwritable="No"
 	for dir in $PATH
 	do
 	    if [ -w $dir ]
 	    then
 		pathdirwritable="Yes"
+		cp -i $(dirname $0)/../$originalscriptname $dir && exit 0
 	    fi
 	done
 	if [ $pathdirwritable = "No" ]
