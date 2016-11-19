@@ -3,7 +3,7 @@
 ## CONFIGURATIONS:
 #
 #  Assign the name of the script to be installed to $originalscriptname.
-originalscriptname=$(basename $(find $(dirname $0)/.. -maxdepth 1 -type f -executable -readable))
+originalscriptname=$(basename $(find $(dirname $0)/.. -maxdepth 1 -type f -perm -u=r -perm -u=x))
 #
 
 #  The name of this script.
