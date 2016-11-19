@@ -59,7 +59,10 @@ Well... this is embarrassing! I could not reproduce the bug.
 Tested with a small filesystem and all seems to be working correctly.
 Let's consider it "done" until proven otherwise.
 
-* TODO Reinvent the wheel: Some concepts need to be revised.
+* DONE Reinvent the wheel: Some concepts need to be revised.
 There is no need for the notion of a "working category".
 The user's working directory (~, $XDG_DESKTOP_DIR or other) should contain "pointers" (links) to the directories of the projects stored on the directories of the categories they are on.
 This might not be ideal since the user might pollute the "working directory" with stuff that cannot later be dealt with by the script like temporary work or downloads or whatever... Maybe we could deal with those later.
+
+* TODO The wheel has been reinvented. Now it is time to test it.
+See if the script behaves appropriately and fix any issues.
