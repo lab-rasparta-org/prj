@@ -611,7 +611,12 @@ unset origin
 return $returnvalue
 }
 
-# CHECKS
+### FUNCTIONS END
+
+## INITIALIZATION END
+#  Should be all set now.
+
+## CHECKS
 # Before I start making mistakes.
 
 # Before anything else, am I configured?
@@ -629,10 +634,7 @@ checkfundamentalprograms || exit 1
 # Have you configured your freedesktop propperly?
 gethomesetup || exit 1
  
-### FUNCTIONS END
-
-## INITIALIZATION END
-#  Should be all set now.
+## CHECKS END
 
 ## MAIN
 #  Let's work, then...
@@ -966,4 +968,4 @@ case $1 in # If $1 is:
 	;;
 esac
 return $?
-## MAIND END :-)
+## MAIN END :-)
