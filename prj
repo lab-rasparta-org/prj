@@ -145,7 +145,7 @@ EOF
 checkfundamentalprograms() { # Searches for fundamental programs. Returns false if one is missing.
     local returnvalue
     returnvalue=0
-    [ $(which which 2>/dev/null) ] || { echo "Cannot find which command."; returnvalue=1; }
+    [ $(which which 2>/dev/null) ] || { echo "Cannot find which command."; return 1; }
     for program in basename cat cut date grep head ls mkdir mktemp mv rm sort tail tar touch tr wc $preferredcompressor $preferrededitor
     do
 	[ $(which $program) ] ||  { echo "$program: Not found."; returnvalue=1; }
