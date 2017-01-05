@@ -689,7 +689,7 @@ case $1 in # If $1 is:
 	shift
 	for project in "$@"
 	do
-	    fixproject $project || returnvalue=1n
+	    fixproject $project || returnvalue=1
 	done
 	return $returnvalue
         ;;
