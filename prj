@@ -666,7 +666,7 @@ case $1 in # If $1 is:
 	return $returnvalue    
 	;;
 
-    easteregg|egg)
+    easteregg|egg) # Undocumented! ;-)
 	echo "You have $(for category in $(listcategories); do listcategoryprojects "$category"; done|wc -l) projects in $(listcategories|wc -l) categories!"
 	return 0
 	;;
