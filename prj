@@ -546,15 +546,6 @@ You can only do that on projects you are currently working on (under $workingcat
 EOF
 }
 
-printstandardproject () { # Prints a message for when trying to move a project away form the working category directory that has a .hidden file in it.
-	    cat << EOF
-This project doesn't seem to be suitable for moving away from your working directory.
-It has a .hidden file in it meaning it is meant to stay in there and look pretty.
-If this is not the case, remove the file and try again.
- 
-EOF
-}
-
 renameproject() { # Gives a project a new name.
 [ -z "$1" ] || [ -z "$2" ] && return 1
 mv $(getcategorydir $(getprojectcategory "$1"))/"$1"  $(getcategorydir $(getprojectcategory "$1"))/"$2" && return 0
