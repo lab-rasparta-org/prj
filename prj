@@ -35,8 +35,8 @@
 
 # The name of your working directory.
 # Skip this if you have configured XDG_DESKTOP_DIR in your ~/.config/user-dirs.dirs file.
-#workingcategorydir=~
-#workingcategorydir=~/Desktop
+#workingdir=~
+#workingdir=~/Desktop
 
 # A fancy name for your working category.
 workingcategoryname="Desktop"
@@ -75,39 +75,39 @@ local returnvalue
 returnvalue=0
 case $(basename $preferredcompressor) in
     bzip2)
-	command="tar -C	"$workingcategorydir" -cpjf"
+	command="tar -C	"$(getcategorydir "$(getprojectcategory "$1")")" -cpjf"
 	destination="$archivesdir/$(gettimestamp).$1.tbz"
 	;;
     gzip)
-	command="tar -C	"$workingcategorydir" -cpzf"
+	command="tar -C	"$(getcategorydir "$(getprojectcategory "$1")")" -cpzf"
 	destination="$archivesdir/$(gettimestamp).$1.tgz"
 	;;
     xz)
-	command="tar -C	"$workingcategorydir" -cpJf"
+	command="tar -C	"$(getcategorydir "$(getprojectcategory "$1")")" -cpJf"
 	destination="$archivesdir/$(gettimestamp).$1.txz"
 	;;
     compress)
-	command="tar -C	"$workingcategorydir" -cpZf"
+	command="tar -C	"$(getcategorydir "$(getprojectcategory "$1")")" -cpZf"
 	destination="$archivesdir/$(gettimestamp).$1.tZ"
 	;;
     lzip)
-    	command="tar -C	"$workingcategorydir" --lzip -cpf"
+    	command="tar -C	"$(getcategorydir "$(getprojectcategory "$1")")" --lzip -cpf"
     	destination="$archivesdir/$(gettimestamp).$1.tlz"
     	;;
     lzma)
-    	command="tar -C	"$workingcategorydir" --lzma -cpf"
+    	command="tar -C	"$(getcategorydir "$(getprojectcategory "$1")")" --lzma -cpf"
     	destination="$archivesdir/$(gettimestamp).$1.tar.lzma"
     	;;
     lzop)
-    	command="tar -C	"$workingcategorydir" --lzop -cpf"
+    	command="tar -C	"$(getcategorydir "$(getprojectcategory "$1")")" --lzop -cpf"
     	destination="$archivesdir/$(gettimestamp).$1.tar.lzo"
     	;;
     none)
-    	command="tar -C	"$workingcategorydir" -cpf"
+    	command="tar -C	"$(getcategorydir "$(getprojectcategory "$1")")" -cpf"
     	destination="$archivesdir/$(gettimestamp).$1.tar"
     	;;
     *)
-	command="tar -C	"$workingcategorydir" -I "$preferredcompressor" -cpf"
+	command="tar -C	"$(getcategorydir "$(getprojectcategory "$1")")" -I "$preferredcompressor" -cpf"
 	destination="$archivesdir/$(gettimestamp).$1.tar.compressed"
 	;;
 esac
@@ -190,18 +190,18 @@ createproject() { # Creates a project.
     [ -z "$1" ] && return 1
     local returnvalue
     returnvalue=0
-    mkdir "$workingcategorydir"/"$1" || returnvalue=1
-    mkdir "$workingcategorydir"/"$1"/trash || returnvalue=1
-    mkdir "$workingcategorydir"/"$1"/."$(basename "$0")" || returnvalue=1
-    echo ""$1" has not yet been described." >  "$workingcategorydir"/"$1"/README || returnvalue=1
-    echo "* TODO Edit the README and the TODO files." >  "$workingcategorydir"/"$1"/TODO || returnvalue=1
+    mkdir "$workingdir"/"$1" || returnvalue=1
+    mkdir "$workingdir"/"$1"/trash || returnvalue=1
+    mkdir "$workingdir"/"$1"/."$(basename "$0")" || returnvalue=1
+    echo ""$1" has not yet been described." >  "$workingdir"/"$1"/README || returnvalue=1
+    echo "* TODO Edit the README and the TODO files." >  "$workingdir"/"$1"/TODO || returnvalue=1
     case $preferredvcs in
 	git)
-	    git init "$workingcategorydir"/"$1" >/dev/null
+	    git init "$workingdir"/"$1" >/dev/null
 	    returnvalue=1
 	;;
 	hg)
-	    hg init "$workingcategorydir"/"$1" >/dev/null
+	    hg init "$workingdir"/"$1" >/dev/null
 	    returnvalue=1
 	;;
 	*)
@@ -267,7 +267,7 @@ getcategorydir() { # Outputs the directory name of a given category.
     local dir
     if [ "$1" = "$workingcategoryprefix" ] || [ "$1" = "$workingcategoryname" ] || [ "$1" = "$workingcategoryprefix.$workingcategoryname" ]
     then
-	echo "$workingcategorydir"
+	echo "$workingdir"
     else
 	[ ! -d $projectsdir/$1 ] && [ ! -d $projectsdir/$1.*/ ] && [ ! -d $projectsdir/*.$1/ ] && return 1
 	[ -d $projectsdir/$1.* ] && dir="$(echo $projectsdir/$1.* | cut -f 1 -d " ")"
@@ -319,20 +319,20 @@ getcategorystatus() { # Prints the prefix.name, and number of projects in catego
     return 0
 }
 
-gethomesetup() { # Fills the values of projectsdir, workingcategorydir and archivesdir with configured values or tryes to create them with default values.
+gethomesetup() { # Fills the values of projectsdir, workingdir and archivesdir with configured values or tryes to create them with default values.
     local returnvalue
     returnvalue=0
     [ -r ~/.config/user-dirs.dirs ] && . ~/.config/user-dirs.dirs
     [ -z "$projectsdir" -a -n "$XDG_PROJECTS_DIR" ] && projectsdir="$XDG_PROJECTS_DIR"
     [ -z "$projectsdir" ] && projectsdir=~/projects
-    [ -z "$workingcategorydir" -a -n "$XDG_DESKTOP_DIR" ] && workingcategorydir="$XDG_DESKTOP_DIR"
-    [ -z "$workingcategorydir" ] && workingcategorydir=~
+    [ -z "$workingdir" -a -n "$XDG_DESKTOP_DIR" ] && workingdir="$XDG_DESKTOP_DIR"
+    [ -z "$workingdir" ] && workingdir=~
     [ -z "$archivesdir" -a -n "$XDG_BACKUPS_DIR" ] && archivesdir="$XDG_BACKUPS_DIR"
     [ -z "$archivesdir" ] && archivesdir=~/backups
     [ -d $projectsdir ] || mkdir -p $projectsdir 2>/dev/null || { echo "Cannot access or create your projects directory."; returnvalue=1; }
     [ -w $projectsdir ] || { echo "Cannot write to your projects directory."; returnvalue=1; }
-    [ -d $workingcategorydir ] || mkdir -p $workingcategorydir 2>/dev/null || { echo "Cannot access or create your working directory."; returnvalue=1; }
-    [ -w $workingcategorydir ] || { echo "Cannot write to your working directory."; returnvalue=1; }
+    [ -d $workingdir ] || mkdir -p $workingdir 2>/dev/null || { echo "Cannot access or create your working directory."; returnvalue=1; }
+    [ -w $workingdir ] || { echo "Cannot write to your working directory."; returnvalue=1; }
     [ -d $archivesdir ] || mkdir -p $archivesdir 2>/dev/null || { echo "Cannot access or create your archives directory."; returnvalue=1; }
     [ -w $archivesdir ] || { echo "Cannot write to your archives directory."; returnvalue=1; }
     return $returnvalue
@@ -340,7 +340,7 @@ gethomesetup() { # Fills the values of projectsdir, workingcategorydir and archi
 
 getid() { # Is this a project or a category?
     [ -z "$1" ] && return 1
-    [ -d "$workingcategorydir"/$1 ] && { echo "project"; return 0; }
+    [ -d "$workingdir"/$1 ] && { echo "project"; return 0; }
     [ -d "$projectsdir"/*/"$1" ] && { echo "project"; return 0; }
     [ -d "$projectsdir"/"$1" ] && { echo "category"; return 0; }
     [ -d "$projectsdir"/"$1".* ] && { echo "category"; return 0; }
@@ -368,7 +368,7 @@ getpreferrededitor() { # Which is the preferred editor?
 
 getprojectcategory() { # What category is a given project in?
     [ -z "$1" ] && return 1
-    [ -d "$workingcategorydir"/"$1" ] && { echo "$workingcategoryname"; return 0; }
+    [ -d "$workingdir"/"$1" ] && { echo "$workingcategoryname"; return 0; }
     [ -d "$projectsdir"/*/"$1" ] && { echo "$(basename $(dirname $(echo "$projectsdir"/*/"$1")) | cut -f 2 -d "." )"; return 0; }
     return 1
 }
@@ -479,8 +479,8 @@ killcategory() { # Removes an entire category!
 
 killproject() { # Removes a project!
     [ -z "$1" ] && return 1
-    rm -fr "$workingcategorydir"/"$1"
-    [ -d "$workingcategorydir"/"$1" ] && return 1 || return 0
+    rm -fr "$workingdir"/"$1"
+    [ -d "$workingdir"/"$1" ] && return 1 || return 0
 }
 
 listarchives() { # Lists archived projects.
@@ -508,9 +508,9 @@ moveproject() { # Moves a project to another category.
     local destiny
     origin="$(getcategorydir "$(getprojectcategory "$1")")"
     destiny="$(getcategorydir "$2")"
-    [ "$origin" = "$workingcategorydir" ] && [ -f "$workingcategorydir"/"$1"/".hidden" ] && return 1
-    [ "$origin" = "$workingcategorydir" ] && { mv "$workingcategorydir"/"$1" "$destiny" && return 0; }
-    [ "$destiny" = "$workingcategorydir" ] && { mv "$origin"/"$1" "$workingcategorydir" && return 0; }
+    [ "$origin" = "$workingdir" ] && [ -f "$workingdir"/"$1"/".hidden" ] && return 1
+    [ "$origin" = "$workingdir" ] && { mv "$workingdir"/"$1" "$destiny" && return 0; }
+    [ "$destiny" = "$workingdir" ] && { mv "$origin"/"$1" "$workingdir" && return 0; }
     mv "$origin"/"$1" "$destiny" && return 0
     unset origin
     unset destiny
@@ -560,39 +560,39 @@ local returnvalue
 returnvalue=0
 case $(basename $preferredcompressor) in
     bzip2)
-	command="tar -C	"$workingcategorydir" -xpjf"
+	command="tar -C	"$workingdir" -xpjf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.tbz"
 	;;
     gzip)
-    	command="tar -C	"$workingcategorydir" -xpzf"
+    	command="tar -C	"$workingdir" -xpzf"
     	origin="$archivesdir/$(getarchivetimestamp $1).$1.tgz"
     	;;
     xz)
-	command="tar -C	"$workingcategorydir" -xpJf"
+	command="tar -C	"$workingdir" -xpJf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.txz"
 	;;
     compress)
-	command="tar -C	"$workingcategorydir" -xpZf"
+	command="tar -C	"$workingdir" -xpZf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.tZ"
 	;;
     lzip)
-	command="tar -C	"$workingcategorydir" --lzip -xpf"
+	command="tar -C	"$workingdir" --lzip -xpf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.tlz"
 	;;
     lzma)
-	command="tar -C	"$workingcategorydir" --lzma -xpf"
+	command="tar -C	"$workingdir" --lzma -xpf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.tar.lzma"
 	;;
     lzop)
-	command="tar -C	"$workingcategorydir" --lzop -xpf"
+	command="tar -C	"$workingdir" --lzop -xpf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.tar.lzo"
 	;;
     none)
-	command="tar -C "$workingcategorydir" -xpf"
+	command="tar -C "$workingdir" -xpf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.tar"
 	;;
     *)
-    	command="tar -C	"$workingcategorydir" -I "$preferredcompressor" -xpf"
+    	command="tar -C	"$workingdir" -I "$preferredcompressor" -xpf"
     	origin="$archivesdir/$(getarchivetimestamp $1).$1.tar.commpressed"
     	;;
 esac
