@@ -369,7 +369,6 @@ getpreferrededitor() { # Which is the preferred editor?
 
 getprojectcategory() { # What category is a given project in?
     [ -z "$1" ] && return 1
-    [ -d "$workingdir"/"$1" ] && { echo "$workingcategoryname"; return 0; }
     [ -d "$projectsdir"/*/"$1" ] && { echo "$(basename $(dirname $(echo "$projectsdir"/*/"$1")) | cut -f 2 -d "." )"; return 0; }
     return 1
 }
