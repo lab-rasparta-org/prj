@@ -628,7 +628,7 @@ gethomesetup || exit 1
 
 ## MAIN
 #  Let's work, then...
-case $1 in # If $1 is:
+case $1 in # If verb ($1) is:
     done) # Archives a project.
 	[ -z "$2" ] &&  { printhelpmessage; exit 1; }
 	shift
@@ -639,18 +639,13 @@ case $1 in # If $1 is:
 	    then
 		echo "$project: Not found."
 		returnvalue=1
-	    elif [ "$(getprojectcategory $project)" != "$workingcategoryname" ]
-	    then
-		printf "$project: "
-		printonlyonworking
-		returnvalue=1
 	    elif [ -f "$archivesdir"/$(gettimestamp)."$project".* ]
 	    then
 		echo "$project: already archived today. Rename the project or deal with the archive."
 		returnvalue=1
 	    else
 		archiveproject "$project" || returnvalue=1
-		[ $? -eq 0 ] && killproject "$project"
+		[ $returnvalue -eq 0 ] && killproject "$project" || returnvalue=1
 	    fi
 	done
 	return $returnvalue    
