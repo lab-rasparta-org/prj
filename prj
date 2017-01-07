@@ -507,9 +507,6 @@ moveproject() { # Moves a project to another category.
     local destiny
     origin="$(getcategorydir "$(getprojectcategory "$1")")"
     destiny="$(getcategorydir "$2")"
-    [ "$origin" = "$workingdir" ] && [ -f "$workingdir"/"$1"/".hidden" ] && return 1
-    [ "$origin" = "$workingdir" ] && { mv "$workingdir"/"$1" "$destiny" && return 0; }
-    [ "$destiny" = "$workingdir" ] && { mv "$origin"/"$1" "$workingdir" && return 0; }
     mv "$origin"/"$1" "$destiny" && return 0
     unset origin
     unset destiny
@@ -551,7 +548,7 @@ mv $(getcategorydir $(getprojectcategory "$1"))/"$1"  $(getcategorydir $(getproj
 return 1
 }
 
-unarchiveproject() { # Extracts the archived project into the working category directory.
+unarchiveproject() { # Extracts the archived project into the default category directory.
 [ -z $1 ] && return 1
 local defaultcategory
 local command
