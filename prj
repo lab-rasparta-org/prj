@@ -490,7 +490,6 @@ listarchives() { # Lists archived projects.
 
 listcategories() { # Lists all the category names. Excludes the prefixes.
     ls -1r "$projectsdir" | cut -f 2- -d "."
-    echo $workingcategoryname
 }
 
 listcategoryprojects() { # List all projects of a given category.
