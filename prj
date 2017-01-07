@@ -691,17 +691,13 @@ case $1 in # If verb ($1) is:
 	for project in $@
 	do
 	    category="$(getprojectcategory "$project")"
-	    if [ "$category" = "$workingcategoryname" ]
-	    then
-		echo "Remove $project permanently? (y/N) "
-		askuseryn && { killproject "$project"; [ $? -eq 0 ] || returnvalue=1 ; } || echo "Whize decision!"
-	    elif [ "$category" = "" ]
+	    if [ "$category" = "" ]
 	    then
 		echo "$project: Not found."
 		returnvalue=1
 	    else
-		printonlyonworking
-		returnvalue=1
+		echo "Remove $project permanently? (y/N) "
+		askuseryn && { killproject "$project"; [ $? -eq 0 ] || returnvalue=1 ; } || echo "Whize decision!"
 	    fi
 	done
 	return $returnvalue
