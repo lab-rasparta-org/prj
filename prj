@@ -319,6 +319,12 @@ getcategorystatus() { # Prints the prefix.name, and number of projects in catego
     return 0
 }
 
+getdefaultcategory() { # Prints the prefix.name of the default category (the first one in collation order depending on the locale setup) or fails if none found.
+    defaultcategory=$(basename $(echo $projectsdir/*/ | cut -f 1 -d " "))
+    [ "$defaultcategory" = "*" ] && unset defaultcategory && return 1
+    [ -n "$defaultcategory" ] && echo "$defaultcategory"
+}
+
 gethomesetup() { # Fills the values of projectsdir, workingdir and archivesdir with configured values or tryes to create them with default values.
     local returnvalue
     returnvalue=0
@@ -554,49 +560,52 @@ return 1
 
 unarchiveproject() { # Extracts the archived project into the working category directory.
 [ -z $1 ] && return 1
+local defaultcategory
 local command
 local origin
 local returnvalue
 returnvalue=0
+defaultcategory="$(getdefaultcategory || return 1)"
 case $(basename $preferredcompressor) in
     bzip2)
-	command="tar -C	"$workingdir" -xpjf"
+	command="tar -C "$projectsdir/$defaultcategory" -xpjf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.tbz"
 	;;
     gzip)
-    	command="tar -C	"$workingdir" -xpzf"
+    	command="tar -C "$projectsdir/$defaultcategory" -xpzf"
     	origin="$archivesdir/$(getarchivetimestamp $1).$1.tgz"
     	;;
     xz)
-	command="tar -C	"$workingdir" -xpJf"
+	command="tar -C "$projectsdir/$defaultcategory" -xpJf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.txz"
 	;;
     compress)
-	command="tar -C	"$workingdir" -xpZf"
+	command="tar -C "$projectsdir/$defaultcategory" -xpZf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.tZ"
 	;;
     lzip)
-	command="tar -C	"$workingdir" --lzip -xpf"
+	command="tar -C "$projectsdir/$defaultcategory" --lzip -xpf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.tlz"
 	;;
     lzma)
-	command="tar -C	"$workingdir" --lzma -xpf"
+	command="tar -C "$projectsdir/$defaultcategory" --lzma -xpf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.tar.lzma"
 	;;
     lzop)
-	command="tar -C	"$workingdir" --lzop -xpf"
+	command="tar -C "$projectsdir/$defaultcategory" --lzop -xpf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.tar.lzo"
 	;;
     none)
-	command="tar -C "$workingdir" -xpf"
+	command="tar -C "$projectsdir/$defaultcategory" -xpf"
 	origin="$archivesdir/$(getarchivetimestamp $1).$1.tar"
 	;;
     *)
-    	command="tar -C	"$workingdir" -I "$preferredcompressor" -xpf"
+    	command="tar -C "$projectsdir/$defaultcategory" -I "$preferredcompressor" -xpf"
     	origin="$archivesdir/$(getarchivetimestamp $1).$1.tar.commpressed"
     	;;
 esac
 $command $origin || returnvalue=1
+unset defaultcategory
 unset command
 unset origin
 return $returnvalue
