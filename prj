@@ -536,12 +536,6 @@ Usage:
 EOF
 }
 
-printonlyonworking() { # Prints a message for when trying to do something to a project not in the working category directory.
-    cat <<EOF
-You can only do that on projects you are currently working on (under $workingcategoryname).
-EOF
-}
-
 renameproject() { # Gives a project a new name.
 [ -z "$1" ] || [ -z "$2" ] && return 1
 mv $(getcategorydir $(getprojectcategory "$1"))/"$1"  $(getcategorydir $(getprojectcategory "$1"))/"$2" && return 0
