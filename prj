@@ -265,16 +265,11 @@ getarchivetimestamp() { # Ecoes the latest version of an archived project.
 getcategorydir() { # Outputs the directory name of a given category.
     [ -z "$1" ] && return 1
     local dir
-    if [ "$1" = "$workingcategoryprefix" ] || [ "$1" = "$workingcategoryname" ] || [ "$1" = "$workingcategoryprefix.$workingcategoryname" ]
-    then
-	echo "$workingdir"
-    else
-	[ ! -d $projectsdir/$1 ] && [ ! -d $projectsdir/$1.*/ ] && [ ! -d $projectsdir/*.$1/ ] && return 1
-	[ -d $projectsdir/$1.* ] && dir="$(echo $projectsdir/$1.* | cut -f 1 -d " ")"
-	[ -d $projectsdir/*.$1 ] && dir="$(echo $projectsdir/*.$1 | cut -f 1 -d " ")"
-	[ -d $projectsdir/$1 ] && dir="$projectsdir/$1"
-	echo "$dir"
-    fi
+    [ ! -d $projectsdir/$1 ] && [ ! -d $projectsdir/$1.*/ ] && [ ! -d $projectsdir/*.$1/ ] && return 1
+    [ -d $projectsdir/$1.* ] && dir="$(echo $projectsdir/$1.* | cut -f 1 -d " ")"
+    [ -d $projectsdir/*.$1 ] && dir="$(echo $projectsdir/*.$1 | cut -f 1 -d " ")"
+    [ -d $projectsdir/$1 ] && dir="$projectsdir/$1"
+    echo "$dir"
     unset dir
     return 0
 }
