@@ -515,20 +515,19 @@ Name:
 	$(basename $0) - A program to help you manage your projects and your chaotic home directory.
  
 Usage:
-	$(basename $0) [do] <projectname>
-	$(basename $0) [done | fix | kill] <projectname(s)>
-	$(basename $0) [help | listarchives|lsa | listcategories|lsc]
-	$(basename $0) [killcategory] <categoryname(s)>
-	$(basename $0) [list|ls | listprojects|lsp] [<categoryname(s)>]
+	$(basename $0) [help | listcategories|lsc]
+	$(basename $0) [listarchives|lsa ] [<expression(s)>]
 	$(basename $0) [move|mv] <projectname> <categoryname>
-	$(basename $0) [new] <projectname(s)>
-	$(basename $0) [newcategory] <categoryname(s)>
-	$(basename $0) [read | todo] <projectname>
+	$(basename $0) [read | start | stop | todo] <projectname>
 	$(basename $0) [rename|rn] <projectname> <projectname>
 	$(basename $0) [run] <projectname> <scriptname> [<scriptargument(s)]
-	$(basename $0) [find] <expression>
+	$(basename $0) [done | fix | kill | new] <projectname(s)>
 	$(basename $0) [status|st] [<categoryname(s)>|<projectname(s)>]
+	$(basename $0) [renamecategory|rnc] <categoryname> <categoryname>
+	$(basename $0) [killcategory ] <categoryname(s)>
+	$(basename $0) [list|ls | listprojects|lsp | newcategory] [<categoryname(s)>]
 	$(basename $0) [redo | undone] <archive(s)>
+	$(basename $0) [find] <expression>
  
 EOF
 }
