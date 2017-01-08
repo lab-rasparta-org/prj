@@ -533,6 +533,12 @@ Usage:
 EOF
 }
 
+renamecategory() { # Gives a category a new name.
+    [ -z "$1" ] || [ -z "$2" ] && return 1
+    mv "$projectsdir"/"$1" "$projectsdir"/"$2" && return 0
+    return 1
+}
+
 renameproject() { # Gives a project a new name.
     [ -z "$1" ] || [ -z "$2" ] && return 1
     mv $(getcategorydir $(getprojectcategory "$1"))/"$1"  $(getcategorydir $(getprojectcategory "$1"))/"$2" && return 0
@@ -869,6 +875,13 @@ case $1 in # If verb ($1) is:
 	[ "$(getid "$2")" != "project" ] && { printhelpmessage; exit 1; }
 	[ -n "$(getid "$3")" ] && { printhelpmessage; exit 1; }
 	renameproject "$2" "$3"
+	;;
+
+    renamecategory|rnc) # Renames a category.
+	[ -z "$2" ] || [ -z "$3" ] || [ -n "$4" ] && { printhelpmessage; exit 1; }	
+	[ "$(getid "$1")" != "category" ] && { printhelpmessage; exit 1; }
+	[ -n "$(getid "$2")" ] && { printhelpmessage; exit 1; }
+	renamecategory "$2" "$3"
 	;;
 
     run) # Runs a given script from a given project with parameters greater than the 4th as parameters.
