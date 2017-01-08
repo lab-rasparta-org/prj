@@ -717,11 +717,7 @@ case $1 in # If verb ($1) is:
 	returnvalue=0
 	for category in $@
 	do
-	    if [ "$(getcategoryname "$category")" = "$workingcategoryname" ]
-	    then
-		echo "$category: Cannot kill your working category."
-		returnvalue=1
-	    elif [ "$(getid "$category")" != "category" ]
+	    if [ "$(getid "$category")" != "category" ]
 	    then
 		echo "$category: Not found."
 		returnvalue=1
