@@ -744,8 +744,16 @@ case $1 in # If verb ($1) is:
 	;;
 
     listarchives|lsa) # Lists archived projects.
-	[ -n "$2" ] && { printhelpmessage; exit 1; }
-	listarchives && return 0
+	if [ -n "$2" ]
+	then
+	    for archive in $@
+	    do
+		[ -f $(echo $archivesdir/*$archive* |cut -f 1 -d " ") ] && echo $archivesdir/*$archive*
+	    done
+	else
+	    listarchives
+	fi
+	return $?
 	;;
 
     listcategories|lsc) # Lists all the categories.
