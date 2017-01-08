@@ -545,6 +545,12 @@ startproject() {
     return 1
 }
 
+stopproject() {
+    [ -z $1 ] && return 1
+    rm "$workingdir"/"$1" && return 0
+    return 1
+}
+
 unarchiveproject() { # Extracts the archived project into the default category directory.
 [ -z $1 ] && return 1
 local defaultcategory
@@ -924,6 +930,13 @@ case $1 in # If verb ($1) is:
 	    done
 	fi
 	return $returnvalue
+	;;
+
+    stop)
+	for argument in "@"
+	do
+	    [ -L "$workingdir"/"$argument" ] && stopproject "$argument"
+	done
 	;;
 
     todo) # Edits the TODO file.
