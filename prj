@@ -190,18 +190,20 @@ createproject() { # Creates a project.
     [ -z "$1" ] && return 1
     local returnvalue
     returnvalue=0
-    mkdir "$workingdir"/"$1" || returnvalue=1
-    mkdir "$workingdir"/"$1"/trash || returnvalue=1
-    mkdir "$workingdir"/"$1"/."$(basename "$0")" || returnvalue=1
-    echo ""$1" has not yet been described." >  "$workingdir"/"$1"/README || returnvalue=1
-    echo "* TODO Edit the README and the TODO files." >  "$workingdir"/"$1"/TODO || returnvalue=1
+    local defaultcategorydir
+    defaultcategorydir=$(getcategorydir $(getdefaultcategory))
+    mkdir "$defaultcategorydir"/"$1" || returnvalue=1
+    mkdir "$defaultcategorydir"/"$1"/trash || returnvalue=1
+    mkdir "$defaultcategorydir"/"$1"/."$(basename "$0")" || returnvalue=1
+    echo ""$1" has not yet been described." >  "$defaultcategorydir"/"$1"/README || returnvalue=1
+    echo "* TODO Edit the README and the TODO files." >  "$defaultcategorydir"/"$1"/TODO || returnvalue=1
     case $preferredvcs in
 	git)
-	    git init "$workingdir"/"$1" >/dev/null
+	    git init "$defaultcategorydir"/"$1" >/dev/null
 	    returnvalue=1
 	;;
 	hg)
-	    hg init "$workingdir"/"$1" >/dev/null
+	    hg init "$defaultcategorydir"/"$1" >/dev/null
 	    returnvalue=1
 	;;
 	*)
@@ -532,9 +534,15 @@ EOF
 }
 
 renameproject() { # Gives a project a new name.
-[ -z "$1" ] || [ -z "$2" ] && return 1
-mv $(getcategorydir $(getprojectcategory "$1"))/"$1"  $(getcategorydir $(getprojectcategory "$1"))/"$2" && return 0
-return 1
+    [ -z "$1" ] || [ -z "$2" ] && return 1
+    mv $(getcategorydir $(getprojectcategory "$1"))/"$1"  $(getcategorydir $(getprojectcategory "$1"))/"$2" && return 0
+    return 1
+}
+
+startproject() {
+    [ -z $1 ] && return 1
+    ln -s $(getcategorydir $(getprojectcategory "$1"))/"$1" "$workingdir"/"$1" && return 0
+    return 1
 }
 
 unarchiveproject() { # Extracts the archived project into the default category directory.
@@ -873,6 +881,13 @@ case $1 in # If verb ($1) is:
 	fi
 	echo ""$2": "$3": Something whent wrong!"
 	return 1
+	;;
+
+    start) # Start working on one or several projects.
+	for argument in "@"
+	do
+	    startproject "$1"
+	done
 	;;
 
     status|st) # Prints a global status or the status of a given category or a given project.
