@@ -467,14 +467,14 @@ return $returnvalue
 
 killcategory() { # Removes an entire category!
     [ -z "$1" ] && return 1
-    local categoryname
-    categoryname="$(getcategoryname "$1")"
     local categorydir
-    categorydir="$(getcategorydir "$categoryname")"
+    categorydir="$(getcategorydir "$(getcategoryname "$1")")"
     rm -fr "$categorydir"
+    local returnvalue
+    [ -d "$categorydir" ] && returnvalue=1 || reuturnvalue=0    
     unset categoryname
     unset categorydir
-    [ -d "$categorydir" ] && return 1 || return 0    
+    return $returnvalue
 }
 
 killproject() { # Removes a project!
