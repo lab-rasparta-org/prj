@@ -517,8 +517,8 @@ Name:
 Usage:
 	$(basename $0) [help | listcategories|lsc | version|v]
 	$(basename $0) [redo | undone] <archive(s)>
-	$(basename $0) [killcategory | newcategory] <categoryname(s)>
 	$(basename $0) [renamecategory|rnc] <categoryname> <categoryname>
+	$(basename $0) [killcategory | newcategory] <categoryname(s)>
 	$(basename $0) [list|ls | listprojects|lsp] [<categoryname(s)>]
 	$(basename $0) [status|st] [<categoryname(s)>|<projectname(s)>]
 	$(basename $0) [find] <expression>
