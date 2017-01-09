@@ -556,7 +556,9 @@ startproject() {
 }
 
 stopproject() {
-    [ -z $1 ] && return 1
+    [ -z "$1" ] && return 1
+    [ "$(getid $1)" != "project" ] && echo ""$1": Not found." && return 1
+    [ ! -L "$workingdir"/"$1" ] && echo ""$1": Not started." && return 1
     rm "$workingdir"/"$1" && return 0
     return 1
 }
@@ -947,9 +949,10 @@ case $1 in # If verb ($1) is:
 	;;
 
     stop)
-	for argument in "@"
+	shift
+	for argument in "$@"
 	do
-	    [ -L "$workingdir"/"$argument" ] && stopproject "$argument"
+	    stopproject "$argument"
 	done
 	;;
 
