@@ -234,7 +234,7 @@ fixproject() { # Turns an ordinary directory into a propper project.
     returnvalue=0
     [ -f $(getcategorydir $(getprojectcategory "$1"))/"$1"/README ] || echo ""$1" has not yet been described." > $(getcategorydir $(getprojectcategory "$1"))/"$1"/README || returnvalue=1
     [ -f $(getcategorydir $(getprojectcategory "$1"))/"$1"/TODO ] || echo "* TODO Edit the README and the TODO files." > $(getcategorydir $(getprojectcategory "$1"))/"$1"/TODO || returnvalue=1
-    [ -d $(getcategorydir $(getprojectcategory "$1"))/"$1"/.$0 ] || mkdir $(getcategorydir $(getprojectcategory "$1"))/"$1"/.$(basename $0) || returnvalue=1
+    [ -d $(getcategorydir $(getprojectcategory "$1"))/"$1"/.$(basename "$0") ] || mkdir $(getcategorydir $(getprojectcategory "$1"))/"$1"/.$(basename "$0") || returnvalue=1
     [ -d $(getcategorydir $(getprojectcategory "$1"))/"$1"/trash ] || mkdir $(getcategorydir $(getprojectcategory "$1"))/"$1"/trash || returnvalue=1
     case "$preferredvcs" in
 	git)
