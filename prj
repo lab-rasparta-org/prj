@@ -549,7 +549,8 @@ renameproject() { # Gives a project a new name.
 }
 
 startproject() {
-    [ -z $1 ] && return 1
+    [ -z "$1" ] && return 1
+    [ "$(getid $1)" != "project" ] && echo ""$1": Not found." && return 1
     ln -s $(getcategorydir $(getprojectcategory "$1"))/"$1" "$workingdir"/"$1" && return 0
     return 1
 }
@@ -902,9 +903,10 @@ case $1 in # If verb ($1) is:
 	;;
 
     start) # Start working on one or several projects.
-	for argument in "@"
+	shift
+	for argument in "$@"
 	do
-	    startproject "$1"
+	    startproject "$argument"
 	done
 	;;
 
