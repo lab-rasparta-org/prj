@@ -146,7 +146,7 @@ checkfundamentalprograms() { # Searches for fundamental programs. Returns false 
     local returnvalue
     returnvalue=0
     [ $(which which 2>/dev/null) ] || { echo "Cannot find which command."; return 1; }
-    for program in basename cat cut date dirname grep head ls mkdir mktemp mv rm sort tail tar touch tr wc $preferredcompressor $preferrededitor
+    for program in basename cat cut date dirname grep head ls mkdir mktemp mv rm sort stat tail tar touch tr wc $preferredcompressor $preferrededitor
     do
 	[ $(which $program) ] ||  { echo "$program: Not found."; returnvalue=1; }
     done
@@ -515,7 +515,7 @@ Name:
 	$(basename $0) - A program to help you manage your projects and your chaotic home directory.
  
 Usage:
-	$(basename $0) [help | listcategories|lsc]
+	$(basename $0) [help | listcategories|lsc | version|v]
 	$(basename $0) [redo | undone] <archive(s)>
 	$(basename $0) [killcategory ] <categoryname(s)>
 	$(basename $0) [renamecategory|rnc] <categoryname> <categoryname>
@@ -530,6 +530,10 @@ Usage:
 	$(basename $0) [done | fix | kill | new] <projectname(s)>
  
 EOF
+}
+
+printversion() { # Prints the version of the script.
+    stat -L -c %y "$0"
 }
 
 renamecategory() { # Gives a category a new name.
@@ -974,6 +978,11 @@ case $1 in # If verb ($1) is:
 	    fi
 	done
 	return $returnvalue
+	;;
+
+    version|v)
+	[ -n "$2" ] && { printhelpmessage; exit 1; }
+	stat -L -c %y "$0"
 	;;
 
     *) # In every other case print the standard help and fail.
