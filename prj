@@ -923,7 +923,7 @@ case $1 in # If verb ($1) is:
 		echo ""
 		getcategorystatus "$category"
 	    done
-	    for project in $(listcategoryprojects $workingcategoryname)
+	    for project in $(basename $workingdir/*)
 	    do
 		echo ""
 		getprojectstatus "$project"
