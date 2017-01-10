@@ -214,15 +214,14 @@ createproject() { # Creates a project.
 
 findinproject() { # Searches for a string in a given project.
     [ -z "$2" ] && return 1
-    local expression
     local project
     local match
     project="$1"
     shift
-    expression=$@
-    match=$(cat $(getcategorydir $(getprojectcategory $project))/$project/README 2>/dev/null | grep -i "${expression}")
+    [ -f $(getcategorydir $(getprojectcategory $project))/$project/README ] && match=$(cat $(getcategorydir $(getprojectcategory $project))/$project/README 2>/dev/null | grep -i "$*")
     [ -n "$match" ] && echo ""$project README":\n${match}"
-    match=$(cat $(getcategorydir $(getprojectcategory $project))/$project/TODO 2>/dev/null | grep -i "${expression}")
+    unset match
+    [ -f $(getcategorydir $(getprojectcategory $project))/$project/TODO ] && match=$(cat $(getcategorydir $(getprojectcategory $project))/$project/TODO 2>/dev/null | grep -i "$*")
     [ -n "$match" ] && echo ""$project TODO":\n${match}"
     unset expression
     unset project
@@ -366,7 +365,7 @@ getpreferrededitor() { # Which is the preferred editor?
 
 getprojectcategory() { # What category is a given project in?
     [ -z "$1" ] && return 1
-    [ -d "$projectsdir"/*/"$1" ] && { echo "$(basename $(dirname $(echo "$projectsdir"/*/"$1")) | cut -f 2 -d "." )"; return 0; }
+    [ -d $(echo "$projectsdir"/*/"$1" | cut -f 1 -d " ") ] && { echo "$(basename $(dirname $(echo "$projectsdir"/*/"$1")) | cut -f 2 -d "." )"; return 0; }
     return 1
 }
 
@@ -677,12 +676,11 @@ case $1 in # If verb ($1) is:
     find) # Searches for an expression in all projects.
 	[ -z "$2" ] && { printhelpmessage; exit 1; }
 	shift
-	expression="$@"
 	for category in $(listcategories)
 	do
 	    for project in $(listcategoryprojects $category)
 	    do
-		findinproject $project ${expression}
+		findinproject $project "$*"
 	    done
 	done
 	;;
