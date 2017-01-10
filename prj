@@ -192,6 +192,7 @@ createproject() { # Creates a project.
     returnvalue=0
     local defaultcategorydir
     defaultcategorydir=$(getcategorydir $(getdefaultcategory))
+    [ -z "$defaultcategorydir" ] && echo "No categories yet!" && return 1
     mkdir "$defaultcategorydir"/"$1" || returnvalue=1
     mkdir "$defaultcategorydir"/"$1"/trash || returnvalue=1
     mkdir "$defaultcategorydir"/"$1"/."$(basename "$0")" || returnvalue=1
