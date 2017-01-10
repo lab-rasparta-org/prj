@@ -291,16 +291,11 @@ getcategoryname() { # Echoes the name of a category given by its prefix, name or
 getcategoryprefix() { # Echoes the prefix of a category given by its prefix, name or prefix.name.
     [ -z "$1" ] && return 1
     local dir
-    if [ "$1" = "$workingcategoryprefix" ] || [ "$1" = "$workingcategoryname" ] || [ "$1" = "$workingcategoryprefix.$workingcategoryname" ]
-    then
-	echo "$workingcategoryprefix"
-    else
-	[ ! -d $projectsdir/$1 ] && [ ! -d $projectsdir/$1.* ] && [ ! -d $projectsdir/*.$1 ] && return 1
-	[ -d $projectsdir/$1.* ] && dir="$(echo $projectsdir/$1.* | cut -f 1 -d " ")"
-	[ -d $projectsdir/*.$1 ] && dir="$(echo $projectsdir/*.$1 | cut -f 1 -d " ")"
-	[ -d $projectsdir/$1 ] && dir="$projectsdir/$1/"
-	echo "$(basename "$dir")" | cut -f 1 -d "."
-    fi
+    [ ! -d $projectsdir/$1 ] && [ ! -d $projectsdir/$1.* ] && [ ! -d $projectsdir/*.$1 ] && return 1
+    [ -d "$(echo $projectsdir/$1.* | cut -f 1 -d " ")" ] && dir="$(echo $projectsdir/$1.* | cut -f 1 -d " ")"
+    [ -d "$(echo $projectsdir/*.$1 | cut -f 1 -d " ")" ] && dir="$(echo $projectsdir/*.$1 | cut -f 1 -d " ")"
+    [ -d $projectsdir/$1 ] && dir="$projectsdir/$1/"
+    echo "$(basename "$dir")" | cut -f 1 -d "."
     unset dir
     return 0
 }
