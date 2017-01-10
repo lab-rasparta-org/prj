@@ -917,20 +917,22 @@ case $1 in # If verb ($1) is:
 	then
 	    for category in $(listcategories)
 	    do
-		echo ""
+		[ -z "$first" ] || echo ""
 		getcategorystatus "$category"
+		first="No"
 	    done
-	    for project in $(basename $workingdir/*)
+	    unset first
+	    for project in $(basename -a $workingdir/*)
 	    do
-		echo ""
-		getprojectstatus "$project"
+		[ -L "$workingdir"/"$project" ] && echo ""
+		[ -L "$workingdir"/"$project" ] && getprojectstatus "$project"
 	    done
 	else
 	    shift
 	    returnvalue=0
 	    for argument in "$@"
 	    do
-		echo ""
+		[ -z "$first" ] || echo ""
 		case $(getid $argument) in
 		    project)
 			getprojectstatus "$argument" || returnvalue=1
@@ -943,7 +945,9 @@ case $1 in # If verb ($1) is:
 			returnvalue=1
 			;;
 		esac
+		first="No"
 	    done
+	    unset first
 	fi
 	return $returnvalue
 	;;
