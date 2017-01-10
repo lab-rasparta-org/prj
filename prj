@@ -990,7 +990,7 @@ case $1 in # If verb ($1) is:
 
     version|v)
 	[ -n "$2" ] && { printhelpmessage; exit 1; }
-	stat -L -c %y "$0"
+	printversion
 	;;
 
     *) # In every other case print the standard help and fail.
