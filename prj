@@ -337,11 +337,10 @@ gethomesetup() { # Fills the values of projectsdir, workingdir and archivesdir w
 
 getid() { # Is this a project or a category?
     [ -z "$1" ] && return 1
-    [ -d "$workingdir"/$1 ] && { echo "project"; return 0; }
-    [ -d "$projectsdir"/*/"$1" ] && { echo "project"; return 0; }
-    [ -d "$projectsdir"/"$1" ] && { echo "category"; return 0; }
-    [ -d "$projectsdir"/"$1".* ] && { echo "category"; return 0; }
-    [ -d "$projectsdir"/*."$1" ] && { echo "category"; return 0; }
+    [ -d "$(echo "$projectsdir"/*/"$1" |cut -f 1 -d " ")" ] && { echo "project"; return 0; }
+    [ -d "$(echo "$projectsdir"/"$1" |cut -f 1 -d " ")" ] && { echo "category"; return 0; }
+    [ -d "$(echo "$projectsdir"/"$1".* |cut -f 1 -d " ")" ] && { echo "category"; return 0; }
+    [ -d "$(echo "$projectsdir"/*."$1" |cut -f 1 -d " ")" ] && { echo "category"; return 0; }
     [ "$1" = "$workingcategoryname" ] && { echo "category"; return 0; }
     [ "$1" = "$workingcategoryprefix" ] && { echo "category"; return 0; }
     return 1
