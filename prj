@@ -741,26 +741,29 @@ case $1 in # If verb ($1) is:
 	then
 	    for category in $(listcategories)
 	    do
-		echo
+		[ -z "$first" ] || echo ""
 		echo "[$category]"
 		listcategoryprojects $category
+		first="No"
 	    done
+	    unset first
 	    return 0
 	else
 	    shift
 	    returnvalue=0
 	    for category in $@
 	    do
+		[ -z "$first" ] || echo ""
 		if [ -z "$(getcategoryname $category)" ]
 		then
-		    echo
 		    echo "$category: Not found."
 		    returnvalue=1
 		else
-		    echo
 		    listcategoryprojects $category
 		fi
+		first="No"
 	    done
+	    unset first
 	    return $returnvalue
 	fi
 	;;
