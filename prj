@@ -20,6 +20,13 @@
 ## INITIALIZATION
 #  Let's set up an appropriete environment for myself...
  
+### DEFINITION
+#  You shouldn't change this.
+# This is the version of the script given by its authors.
+# You still have YOUR version in the form of the date you last changed it. That's what you should be concearned about.
+readonly VERSION="2.1"
+### DEFINITION END
+
 ### CONFIGURATION
 #  Configure me here
 # Where do you want your stuff? If you leave this as is, I'll try to get the proper values from the environment.
@@ -54,6 +61,8 @@ preferrededitor="emacs24-nox"
 
 # Are you done with the configurations above? If so, change next variable to "Yes" (note capitalization!).
 doneconfiguring="No"
+
+
 
 ### CONFIGURATION END
 #  Stop configuring, your job is done here. Go use me and be marry.
@@ -306,9 +315,11 @@ getcategorystatus() { # Prints the prefix.name, and number of projects in catego
 }
 
 getdefaultcategory() { # Prints the prefix.name of the default category (the first one in collation order depending on the locale setup) or fails if none found.
+local defaultcategory
     defaultcategory=$(basename $(echo $projectsdir/*/ | cut -f 1 -d " "))
     [ "$defaultcategory" = "*" ] && unset defaultcategory && return 1
     [ -n "$defaultcategory" ] && echo "$defaultcategory"
+    unset defaultcategory
 }
 
 gethomesetup() { # Fills the values of projectsdir, workingdir and archivesdir with configured values or tryes to create them with default values.
@@ -460,7 +471,6 @@ killcategory() { # Removes an entire category!
     rm -fr "$categorydir"
     local returnvalue
     [ -d "$categorydir" ] && returnvalue=1 || reuturnvalue=0    
-    unset categoryname
     unset categorydir
     return $returnvalue
 }
@@ -524,7 +534,7 @@ EOF
 }
 
 printversion() { # Prints the version of the script.
-    stat -L -c %y "$0"
+    echo "Version: $VERSION (Last changed: $(stat -L -c %y "$0"))."
 }
 
 renamecategory() { # Gives a category a new name.
@@ -532,6 +542,7 @@ renamecategory() { # Gives a category a new name.
     local origincategory
     origincategory=$(getcategorydir "$1")
     mv "$origincategory" "$projectsdir"/"$2" && return 0
+    unset origincategory
     return 1
 }
 
