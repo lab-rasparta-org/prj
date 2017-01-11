@@ -141,6 +141,7 @@ EOF
 
 checkfundamentalprograms() { # Searches for fundamental programs. Returns false if one is missing.
     local returnvalue
+    local program
     returnvalue=0
     [ $(which which 2>/dev/null) ] || { echo "Cannot find which command."; return 1; }
     for program in basename cat cut date dirname grep head ls mkdir mktemp mv rm sort stat tail tar touch tr wc $preferredcompressor $preferrededitor
@@ -156,6 +157,7 @@ You'll need to install them first, or hack on the code!
  
 EOF
     fi
+    unset program
     return $returnvalue
 }
 
