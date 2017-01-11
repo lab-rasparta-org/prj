@@ -56,7 +56,7 @@ preferredcompressor="bzip2"
 # What is your preferred text editor?
 # I'll look for one unless you provide me with a value for the next variable.
 #preferrededitor=emacs23-nox
-preferrededitor="emacs23-nox"
+preferrededitor="emacs24-nox"
 
 # Are you done with the configurations above? If so, change next variable to "Yes" (note capitalization!).
 doneconfiguring="No"
