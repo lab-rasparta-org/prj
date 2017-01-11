@@ -52,6 +52,9 @@ Stick it on the webpage.
 Create the favicon.ico. Aply it.
 Done! It's not the best favicon ever, but lets use it untill something better comes along.
 
-* TODO Bug in done) verb: if compression fails, it still removes the uncompressed project!
+* DONE Bug in done) verb: if compression fails, it still removes the uncompressed project!
 The user looses data!
 Dangerous!
+Well... this is embarrassing! I could not reproduce the bug.
+Tested with a small filesystem and all seems to be working correctly.
+Let's consider it "done" until proven otherwise.
