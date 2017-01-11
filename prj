@@ -112,12 +112,15 @@ return $returnvalue
 }
 
 askuseryn() { # Asks the user for input. Returns 0 if input is "y" or "Y".
+    local ansewr
     read answer
     case $answer in
 	y|Y)
+	    unset answer
 	    return 0
 	    ;;
 	*)
+	    unset answer
 	    return 1
 	    ;;
     esac
