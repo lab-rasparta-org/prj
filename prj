@@ -196,7 +196,7 @@ createproject() { # Creates a project.
     mkdir "$defaultcategorydir"/"$1"/trash || returnvalue=1
     mkdir "$defaultcategorydir"/"$1"/."$(basename "$0")" || returnvalue=1
     echo ""$1" has not yet been described." >  "$defaultcategorydir"/"$1"/README || returnvalue=1
-    echo "* TODO Edit the README and the TODO files." >  "$defaultcategorydir"/"$1"/TODO || returnvalue=1
+    echo "* TODO Edit the README and the TODO files on "$1"." >  "$defaultcategorydir"/"$1"/TODO || returnvalue=1
     case $preferredvcs in
 	git)
 	    git init "$defaultcategorydir"/"$1" >/dev/null
@@ -209,6 +209,7 @@ createproject() { # Creates a project.
 	*)
 	;;
     esac
+    unset defaultcategorydir
     return $returnvalue
 }
 
