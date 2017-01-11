@@ -224,7 +224,6 @@ findinproject() { # Searches for a string in a given project.
     unset match
     [ -f $(getcategorydir $(getprojectcategory $project))/$project/TODO ] && match=$(cat $(getcategorydir $(getprojectcategory $project))/$project/TODO 2>/dev/null | grep -i "$*")
     [ -n "$match" ] && echo ""$project TODO":\n${match}"
-    unset expression
     unset project
     unset match
 }
@@ -291,7 +290,7 @@ getcategoryname() { # Echoes the name of a category given by its prefix, name or
 getcategoryprefix() { # Echoes the prefix of a category given by its prefix, name or prefix.name.
     [ -z "$1" ] && return 1
     local dir
-    [ ! -d $projectsdir/$1 ] && [ ! -d $projectsdir/$1.* ] && [ ! -d $projectsdir/*.$1 ] && return 1
+    [ ! -d $projectsdir/$1 ] && [ ! -d "$(echo $projectsdir/$1.* | cut -f 1 -d " ")" ] && [ ! -d "$(echo $projectsdir/*.$1 | cut -f 1 -d " ")" ] && return 1
     [ -d "$(echo $projectsdir/$1.* | cut -f 1 -d " ")" ] && dir="$(echo $projectsdir/$1.* | cut -f 1 -d " ")"
     [ -d "$(echo $projectsdir/*.$1 | cut -f 1 -d " ")" ] && dir="$(echo $projectsdir/*.$1 | cut -f 1 -d " ")"
     [ -d $projectsdir/$1 ] && dir="$projectsdir/$1/"
