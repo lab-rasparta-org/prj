@@ -38,12 +38,6 @@
 #workingdir=~
 #workingdir=~/Desktop
 
-# A fancy name for your working category.
-workingcategoryname="Desktop"
-
-# It's prefix.
-workingcategoryprefix="0"
-
 # What version control system do you want to use?
 # Possible options are "git", "hg" (for mercury) or "none" for no use of a VCS. You really should consider using one.
 preferredvcs="git"
@@ -337,8 +331,6 @@ getid() { # Is this a project or a category?
     [ -d "$(echo "$projectsdir"/"$1" |cut -f 1 -d " ")" ] && { echo "category"; return 0; }
     [ -d "$(echo "$projectsdir"/"$1".* |cut -f 1 -d " ")" ] && { echo "category"; return 0; }
     [ -d "$(echo "$projectsdir"/*."$1" |cut -f 1 -d " ")" ] && { echo "category"; return 0; }
-    [ "$1" = "$workingcategoryname" ] && { echo "category"; return 0; }
-    [ "$1" = "$workingcategoryprefix" ] && { echo "category"; return 0; }
     return 1
 }
 
