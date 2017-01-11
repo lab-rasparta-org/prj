@@ -544,7 +544,7 @@ renameproject() { # Gives a project a new name.
     return 1
 }
 
-startproject() {
+startproject() { # Creates a link to the project on the working directory.
     [ -z "$1" ] && return 1
     [ "$(getid $1)" != "project" ] && echo ""$1": Not found." && return 1
     [ -L "$workingdir"/"$1" ] && echo ""$1": Already started." && return 1
@@ -552,7 +552,7 @@ startproject() {
     return 1
 }
 
-stopproject() {
+stopproject() { # Removes the link to the project from the working directory.
     [ -z "$1" ] && return 1
     [ "$(getid $1)" != "project" ] && echo ""$1": Not found." && return 1
     [ ! -L "$workingdir"/"$1" ] && echo ""$1": Not started." && return 1
