@@ -152,10 +152,9 @@ checkfundamentalprograms() { # Searches for fundamental programs. Returns false 
     local returnvalue
     local program
     returnvalue=0
-    [ $(which which 2>/dev/null) ] || { echo "Cannot find which command."; return 1; }
     for program in basename cat cut date dirname grep head ls mkdir mktemp mv rm sort stat tail tar touch tr wc $preferredcompressor $preferrededitor
     do
-	[ $(which $program) ] ||  { echo "$program: Not found."; returnvalue=1; }
+	type $program >/dev/null 2>&1 ||  { echo "$program: Not found."; returnvalue=1; }
     done
     if [ $returnvalue = 1 ]
     then
@@ -353,7 +352,7 @@ getid() { # Is this a project or a category?
 getpreferredcompressor() { # Which is the preferred compressor?
     if [ -z "$preferredcompressor" ]
     then
-	preferredcompressor=$(basename $(which bzip2)) || preferredcompressor=$(basename $(which gzip)) || preferredcompressor=$(basename $(which xz)) || preferredcompressor=$(basename $(which compress)) || preferredcompressor=$(basename $(which lzop)) || preferredcompressor="none"
+	preferredcompressor=$(basename $(type -P bzip2)) || preferredcompressor=$(basename $(type -P gzip)) || preferredcompressor=$(basename $(type -P xz)) || preferredcompressor=$(basename $(type -P compress)) || preferredcompressor=$(basename $(type -P lzop)) || preferredcompressor="none"
     fi
     [ -n "$preferredcompressor" ] && return 0 || return 1
 }
@@ -361,7 +360,7 @@ getpreferredcompressor() { # Which is the preferred compressor?
 getpreferrededitor() { # Which is the preferred editor?
     if [ -z "$preferrededitor" ]
     then
-	preferrededitor=$(which $EDITOR) || preferrededitor=$(which editor) || preferrededitor=$(which emacs) || preferrededitor=$(which vi) || preferrededitor=$(which vim) || preferrededitor=$(which nano) || unset preferrededitor
+	preferrededitor=$(type -P $EDITOR) || preferrededitor=$(type -P editor) || preferrededitor=$(type -P emacs) || preferrededitor=$(type -P vi) || preferrededitor=$(type -P vim) || preferrededitor=$(type -P nano) || unset preferrededitor
     fi
     [ -n "$preferrededitor" ] && return 0 || return 1
 }
