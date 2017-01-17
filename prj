@@ -482,7 +482,7 @@ killproject() { # Removes a project!
 }
 
 listarchives() { # Lists archived projects.
-    ls -1 $archivesdir && return 0
+    ls -1 $archivesdir | grep --invert-match -e README -e TODO && return 0
     return 1
 }
 
