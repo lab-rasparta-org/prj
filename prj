@@ -60,9 +60,7 @@ preferredcompressor="bzip2"
 preferrededitor="emacs24-nox"
 
 # Are you done with the configurations above? If so, change next variable to "Yes" (note capitalization!).
-doneconfiguring="No"
-
-
+doneconfiguring="Yes"
 
 ### CONFIGURATION END
 #  Stop configuring, your job is done here. Go use me and be marry.
@@ -274,10 +272,10 @@ getarchivetimestamp() { # Ecoes the latest version of an archived project.
 getcategorydir() { # Outputs the directory name of a given category.
     [ -z "$1" ] && return 1
     local dir
-    [ ! -d $projectsdir/$1 ] && [ ! -d $projectsdir/$1.*/ ] && [ ! -d $projectsdir/*.$1/ ] && return 1
-    [ -d $projectsdir/$1.* ] && dir="$(echo $projectsdir/$1.* | cut -f 1 -d " ")"
-    [ -d $projectsdir/*.$1 ] && dir="$(echo $projectsdir/*.$1 | cut -f 1 -d " ")"
-    [ -d $projectsdir/$1 ] && dir="$projectsdir/$1"
+    [ ! -d $projectsdir/$1/ ] && [ ! -d $projectsdir/$1.*/ ] && [ ! -d $projectsdir/*.$1/ ] && return 1
+    [ -d $projectsdir/$1.*/ ] && dir="$(echo $projectsdir/$1.*/ | cut -f 1 -d " ")"
+    [ -d $projectsdir/*.$1/ ] && dir="$(echo $projectsdir/*.$1/ | cut -f 1 -d " ")"
+    [ -d $projectsdir/$1/ ] && dir="$projectsdir/$1/"
     echo "$dir"
     unset dir
     return 0
