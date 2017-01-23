@@ -928,10 +928,10 @@ case $1 in # If verb ($1) is:
 		first="No"
 	    done
 	    unset first
-	    for project in $(basename -a $workingdir/*)
+	    for project in $(echo $workingdir/*/)
 	    do
-		[ -L "$workingdir"/"$project" ] && echo ""
-		[ -L "$workingdir"/"$project" ] && getprojectstatus "$project"
+		[ -L "$workingdir"/$(basename "$project") ] && echo ""
+		[ -L "$workingdir"/$(basename "$project") ] && getprojectstatus "$(basename $project)"
 	    done
 	else
 	    shift
