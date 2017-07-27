@@ -12,9 +12,9 @@ This script is called "prj", but it can be called anything you want, really. Jus
 
 We will use the "prj" default name throughout our present documentation effort.
 
-The whole idea is that you keep your work organised into projects in your home directory. Each project in its own directory, placed, itself, in special directories corresponding to categories.
+The whole idea is that you keep your work organised into projects. Each project in its own directory, placed, itself, in one of some special directories corresponding to categories you create yourself.
 
-If you dare to look inside the script (and you really should, as we discussed before), you'll notice there is a place to name the directory that will be hosting your current projects (the working category). Another directory will host all other categories, containing, themselves, other projects. Each project is, itself, a directory with some standard content inside to make the project manageable by the script.
+If you dare to look inside the script (and you really should, as we discussed before), you'll notice there is a place to name the directory that will be hosting your current projects (the working category, or, as usualy is named, the "Desktop"). Another directory will host all other categories, containing, themselves, other projects. Each project is, itself, a directory with some standard content inside to make the project manageable by the script.
 
 Here's the required ASCIIart example:
 
@@ -37,15 +37,15 @@ Here's the required ASCIIart example:
  |   \  [+] Never_gonna_get_to_touch_this\
 ...
 
-Except for the working category, that has a virtual name and prefix, which you can assign changing the values of the variables "workingcategoryname" and "workingcategoryprefix", categories are named and prefixed after their directory names. Anything before a first dot in the name of the directory is the prefix. Anything after that is the category name. The prefix is used to sort them and as a short name for the category. So, if you want your "VeryUrgent" category to come before "QuiteUrgent" category, and that before "NotUrgent", name the directories a.VeryUrgent, b.QuiteUrgent and c.NotUrgent, for example.
+You'll notice the "Projects" directory is not a subdirectory of the "Desktop". That is so that it doesn't count as a project itself. The directory containing your categories (which contain themselves the projects) should not be one. You can arrange it to be hidden or somehow outside of your working directory.
+
+Categories are the directories directly inside the projects directory (there is only one level of categories). They are named and prefixed after their directory names. Anything before a first dot in the name of the directory is the prefix. Anything after that is the category name. The prefix is used to sort them and as a short name for the category. So, if you want your "VeryUrgent" category to come before "QuiteUrgent" category, and that before "NotUrgent", name the directories a.VeryUrgent, b.QuiteUrgent and c.NotUrgent, for example.
 
 You can refer to the category by its name or by its prefix. Which is handy, since it's short.
 
-The prefix will not, normally, be shown unless you dig manually inside the categories directory.
+The prefix will not, normally, be shown unless you dig manually inside the projects directory.
 
 Each category can, then, hold as many projects as you like. Use them to categorise your projects by whatever criteria you might come up with. Just choose wisely or you'll be very sorry very soon.
-
-By default, the working category is named "Desktop" and its prefix is "0" (that's a zero).
 
 You can move projects from one category to another as you see fit.
 
@@ -55,11 +55,11 @@ Each project is a directory stored inside one of the categories. Let's take a lo
 
 1. A ".git" subdirectory. You can delete it if you don't want the project under git. Because of git, you might also have a ".gitignore" file. You can use this file to tell git to ignore the trash directory, if you wish (see below).
 
-2. The ".prj" subdirectory. This is a configuration directory. You can use it to store a few items that, not being meant to be seen, are important for the behaviour of the script in relation to the particular project it is placed under.
+2. The ".prj" subdirectory. This is a configuration directory. You can use it to store a few items that, not being meant to be seen, are important for the behaviour of the script in relation to the particular project it is placed under. Keep it, you need it.
 
 The name of this directory is ".prj" because the default name of the script is "prj". If ever you choose to rename the script something else, you have to change the name of this directory accordingly in every ancient project. Just look for how to use the for loop in your shell's manual. New projects will have it correctly named.
 
-Inside this directory you can place scripts, meant to be run both: by the script using the mechanism prepared for that, and manually. For that to work, and for a nice integration with the script, the scripts must be executable files (obviously) named whatever you like but with a ".sh" extension. They must, also, print to stdout a little self description if called with "aboutme" as first and only argument, and a help message, if that argument is "help".
+Inside this directory you can place scripts, meant to be run both: by the script using the mechanism prepared for that, and manually. For that to work, and for a nice integration with the script, the scripts must be executable files (obviously) named whatever you like but with a ".sh" extension. They must, also, print to stdout a line with a little self description if called with "aboutme" as first and only argument, and a help message, if that argument is "help".
 
 You can also place special files indicating the relationship the project has with other projects. The script recognises "depends" as a dependency so far, and refuses to archive a project that still has dependencies. The content of these files is not used by the script at the moment, so you can use it to store notes about the reason why a project might be dependent on another.
 
@@ -83,11 +83,9 @@ The script accepts what we call "verbs" (they might not be actual verbs, in the 
 
 If you do provide one of the following, the script will execute as follows:
 
-"do" - The script will drop you in a subshell inside the directory of the project. If it is not in the working directory it will be moved there. The prompt will change to something meaningful to the project and easily recognisable. When you exit the subshell, some information might be provided to you and the script will terminate.
-
 "done" - The project entered as next argument will be packed with a timestamp prefixed to its name and moved to the archives directory.
 
-"find" - Will search for a string of text in every REDME and TODO file.
+"find" - Will search for a string of text in every REDME and TODO file. Haven't I told you the for loop of your shell is awesome?
 
 "fix" - Will turn a standard directory into a valid project or try to fix an invalid one (creating the README and TODO files, the trash and .prj subdirectories and initialising the VCS system).
 
@@ -97,35 +95,41 @@ If you do provide one of the following, the script will execute as follows:
 
 "killcategory" - Will kill an empty category by deleting its directory.
 
-"list" or simply "ls" - If category names are provided as arguments only projects in said categories will be listed preceded by an empty line and the category name inside square brackets. If none is specified, all categories are listed, including the working category.
+"list" or simply "ls" - If category names are provided as arguments only projects in said categories will be listed. If none is specified, all categories are listed preceded by an empty line and the category name inside square brackets.
 
 "listarchives" or "lsa" - will list the projects you archived.
 
 "listcategories" or "lsc", for short - Will print the categories names. Simple.
 
-"listprojects" or only "lsp" - Will print all projects sorted alphabetically and in reverse order of the categories (the one with the precedent prefix is the last one to be printed except for the working category that is always the last to be printed).
+"listprojects" or only "lsp" - Will print all projects sorted alphabetically and in reverse order of the categories (the one with the precedent prefix is the last one to be printed).
 
 "move" or "mv" - Will move a project from one category to another.
 
-"new" - Will create a new project in your working directory with all it needs: the "README" and "TODO" files, the ".prj" and "trash" subdirectories and, if you have git, the project will be initialised and will, therefore, have a ".git" subdirectory.
+"new" - Will create a new project in your working directory with all it needs: the "README" and "TODO" files, the ".prj" and "trash" subdirectories and, if you have a VCS system, the project will be initialised in that VCS.
 
 "newcategory" - Creates a new category. This one was easy.
 
 "read" - Will open the "README" file in your preferred text editor.
 
-"redo" - Will unarchive the last version of an archived project and place it in your working category. The archive will not be removed.
+"redo" - Will unarchive the last version of an archived project and place it in your first category. The archive will not be removed.
 
 "rename" or "rn" - Renames a project. Easy too.
 
+"renamecategory" or "rnc" - Will rename a category (include a prefix in the new name).
+
 "run" - runs a script belonging to a given project, stored in its ".prj" directory. You don't include the ".sh" suffix in the name of the script when calling it using this mechanism. All remaining arguments will be passed to the script.
 
-"search" - Searches for the rest of the arguments as a string in the names of all projects and in the "README" and "TODO" files of all projects. Haven't I told you the for loop of your shell is awesome?
+"start" - will link to the project's dirctory from you working directory (handy).
 
 "status" - Prints a nice overview of the current situation. If the name of at least one project or category is provided, it will print more detailed information about that particular project(s) or categor(y|ies).
+
+"stop" - will remove the link to the project's dirctory from you working directory.
 
 "todo" - Will open the "TODO" file in your preferred text editor.
 
 "undone" - Just like redo, it will unarchive an archived project, but will remove the archive as if you had never archived it in the first place.
+
+"version" or just "v" - Will spit its version information.
 
 In every other case, if anything else is entered in the place of the verb, the script will complain printing the standard help message and failing.
 
@@ -135,21 +139,16 @@ Name:
 	prj - A program to help you manage your projects and your chaotic home directory.
  
 Usage:
-	prj [do] <projectname>
-	prj [done | fix | kill] <projectname(s)>
-	prj [help | listarchives|lsa | listcategories|lsc]
-	prj [killcategory] <categoryname(s)>
+	prj [help | listcategories|lsc | version|v]
+	prj [redo | undone] <archive(s)>
+	prj [renamecategory|rnc] <categoryname> <categoryname>
+	prj [killcategory | newcategory] <categoryname(s)>
 	prj [list|ls | listprojects|lsp] [<categoryname(s)>]
+	prj [status|st] [<categoryname(s)>|<projectname(s)>]
+	prj [find] <expression>
+	prj [listarchives|lsa ] [<expression(s)>]
 	prj [move|mv] <projectname> <categoryname>
-	prj [new] <projectname(s)>
-	prj [newcategory] <categoryname(s)>
-	prj [read | todo] <projectname>
+	prj [read | start | stop | todo] <projectname>
 	prj [rename|rn] <projectname> <projectname>
 	prj [run] <projectname> <scriptname> [<scriptargument(s)]
-	prj [find] <expression>
-	prj [status|st] [<categoryname(s)>|<projectname(s)>]
-	prj [redo | undone] <archive(s)>
-
-You can learn more by going to the project's homepage:
-
-http://prj.lab.rasparta.org/
+	prj [done | fix | kill | new] <projectname(s)>
