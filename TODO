@@ -36,4 +36,16 @@ Also added some more options, like the option to download just the prj file or b
 * DONE Add a nice 404 page.
 not found
 8-(
+
+* TODO The text shouldn't be larger than the buttons.
+Will have to revise all other classes too.
+
+* TODO The whole button should be the link!
+
+* TODO Link on the icon
+Should point to the landing page.
+
+* TODO Add usecases
+And see if Sheena is not outdated!
+
 * TODO Add functionality?
