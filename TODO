@@ -64,5 +64,12 @@ There is no need for the notion of a "working category".
 The user's working directory (~, $XDG_DESKTOP_DIR or other) should contain "pointers" (links) to the directories of the projects stored on the directories of the categories they are on.
 This might not be ideal since the user might pollute the "working directory" with stuff that cannot later be dealt with by the script like temporary work or downloads or whatever... Maybe we could deal with those later.
 
+* DONE Revise the documentation
+Some say it is not done until the documentation is ready!
+:-P
+
+* TODO Revise the webpage
+It is "documentation" as well!...
+
 * TODO The wheel has been reinvented. Now it is time to test it.
 See if the script behaves appropriately and fix any issues.
