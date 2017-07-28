@@ -40,9 +40,9 @@ not found
 * TODO The text shouldn't be larger than the buttons.
 Will have to revise all other classes too.
 
-* TODO The whole button should be the link!
+* DONE The whole button should be the link!
 
-* TODO Link on the icon
+* DONE Link on the icon
 Should point to the landing page.
 
 * TODO Add usecases
