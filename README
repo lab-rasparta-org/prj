@@ -97,7 +97,7 @@ If you do provide one of the following, the script will execute as follows:
 
 "list" or simply "ls" - If category names are provided as arguments only projects in said categories will be listed. If none is specified, all categories are listed preceded by an empty line and the category name inside square brackets.
 
-"listarchives" or "lsa" - will list the projects you archived.
+"listarchives" or "lsa" - Will list the projects you archived.
 
 "listcategories" or "lsc", for short - Will print the categories names. Simple.
 
@@ -105,7 +105,7 @@ If you do provide one of the following, the script will execute as follows:
 
 "move" or "mv" - Will move a project from one category to another.
 
-"new" - Will create a new project in your working directory with all it needs: the "README" and "TODO" files, the ".prj" and "trash" subdirectories and, if you have a VCS system, the project will be initialised in that VCS.
+"new" - Will create a new project in your first category with all it needs: the "README" and "TODO" files, the ".prj" and "trash" subdirectories and, if you have a VCS system, the project will be initialised in that VCS.
 
 "newcategory" - Creates a new category. This one was easy.
 
@@ -117,13 +117,13 @@ If you do provide one of the following, the script will execute as follows:
 
 "renamecategory" or "rnc" - Will rename a category (include a prefix in the new name).
 
-"run" - runs a script belonging to a given project, stored in its ".prj" directory. You don't include the ".sh" suffix in the name of the script when calling it using this mechanism. All remaining arguments will be passed to the script.
+"run" - Runs a script belonging to a given project, stored in its ".prj" directory. You don't include the ".sh" suffix in the name of the script when calling it using this mechanism. All remaining arguments will be passed to the script.
 
-"start" - will link to the project's dirctory from you working directory (handy).
+"start" - Will link to the project's dirctory from you working directory (handy).
 
 "status" - Prints a nice overview of the current situation. If the name of at least one project or category is provided, it will print more detailed information about that particular project(s) or categor(y|ies).
 
-"stop" - will remove the link to the project's dirctory from you working directory.
+"stop" - Will remove the link to the project's dirctory from you working directory.
 
 "todo" - Will open the "TODO" file in your preferred text editor.
 
