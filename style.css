@@ -17,6 +17,11 @@ img#icon {
     float: left;
 }
 
+h2{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
 header {
     height: 100px;
     width: 100%;
@@ -24,6 +29,11 @@ header {
     background: left;
     background-image: url(prj.png);
     background-repeat: no-repeat;
+}
+
+p {
+    margin-left: calc(25% - 50px);
+    margin-right: calc(25% - 50px);
 }
 
 p.projectname {
@@ -40,9 +50,15 @@ p.projectdescription {
     text-align: center;
 }
 
+p.note {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: 20px;
+    line-height: 20px;
+    font-size: 0.7em;
+}
+
 p.link {
-    margin-left: calc(25% - 50px);
-    margin-right: calc(25% - 50px);
     margin-top: 20px;
     margin-bottom: 20px;
     padding: 15px;
@@ -74,13 +90,23 @@ a:hover {
     text-shadow: 0px 0px 5px chocolate;
 }
 
+dt {
+    margin-left: calc(25% - 50px);
+    margin-right: calc(25% - 50px);
+}
+
 nav {
     text-align: center;
 }
 
+h2 {
+    margin-left: calc(25% - 50px);
+    margin-right: calc(25% - 50px);
+}
+
 li {
-    margin-left: 25%;
-    margin-right: 25%;
+    margin-left: calc(25% - 50px);
+    margin-right: calc(25% - 50px);
     margin-top: 20px;
     margin-bottom: 20px;
     padding: 15px;
@@ -94,6 +120,8 @@ li:hover {
 }
 
 dd {
+    margin-left: calc(25% - 50px);
+    margin-right: calc(25% - 50px);
     text-indent: 25px;
     text-align: left;
     margin-bottom: 1em;
@@ -106,8 +134,8 @@ dt {
 }
 
 blockquote {
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: calc(25% - 50px);
+    margin-right: calc(25% - 50px);
     margin-top: 15px;
     margin-bottom: 15px;
     padding: 15px;
@@ -116,16 +144,20 @@ blockquote {
 }
 
 blockquote.left {
-    margin-right: 25%;
+    margin-left: calc(25% - 50px);
+    margin-right: calc(40% - 50px);
+    border-top-left-radius: 0
 }
 
 blockquote.right {
-    margin-left: 25%;
+    margin-left: calc(40% - 50px);
+    margin-right: calc(25% - 50px);
+    border-top-right-radius: 0
 }
 
 pre {
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: calc(25% - 50px);
+    margin-right: calc(25% - 50px);
     margin-top: 20px;
     margin-bottom: 20px;
     padding: 15px;
@@ -157,8 +189,8 @@ pre.input li:before {
 }
 
 figure {
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: calc(25% - 50px);
+    margin-right: calc(25% - 50px);
     margin-top: 15px;
     margin-bottom: 15px;
     padding: 15px;
