@@ -231,7 +231,7 @@ enableproject() { # Creates a link to the project on the working directory.
     [ -z "$1" ] && return 1
     [ "$(getid $1)" != "project" ] && echo ""$1": Not found." && return 1
     [ -L "$workingdir"/"$1" ] && echo ""$1": Already enabled." && return 1
-    ln -s $(getcategorydir $(getprojectcategory "$1"))/"$1" "$workingdir"/"$1" && return 0
+    ln -s $(getcategorydir $(getprojectcategory "$1"))"$1" "$workingdir"/"$1" && return 0
     return 1
 }
 
@@ -670,6 +670,7 @@ case $1 in # If verb ($1) is:
 		returnvalue=1
 	    else
 		archiveproject "$project" || returnvalue=1
+		disableproject "$project" || returnvalue=1
 		[ $returnvalue -eq 0 ] && killproject "$project" || returnvalue=1
 	    fi
 	done
@@ -729,7 +730,7 @@ case $1 in # If verb ($1) is:
 		returnvalue=1
 	    else
 		echo "Remove $project permanently? (y/N) "
-		askuseryn && { killproject "$project"; [ $? -eq 0 ] || returnvalue=1 ; } || echo "Whize decision!"
+		askuseryn && { [ -L $workingdir/"$project" ] && disableproject "$project"; killproject "$project"; [ $? -eq 0 ] || returnvalue=1 ; } || echo "Whize decision!"
 	    fi
 	done
 	return $returnvalue
@@ -829,10 +830,12 @@ case $1 in # If verb ($1) is:
 	origin="$(getcategorydir "$(getprojectcategory "$2")")"
 	destiny="$(getcategorydir "$3")"
 	[ "$origin" = "$destiny" ] && { echo "$2 already in $(getcategoryname "$3")."; return 1; }
-	moveproject "$2" "$3" && return 0
+	moveproject "$2" "$3"
+	[ -L $workingdir/$2 ] && { disableproject $2; enableproject $2; }
+	return 0
 	;;
 
-    new) # Creates a new project.
+    new) # Creates and enables a new project.
 	[ -z "$2" ] && { printhelpmessage; exit 1; }
 	shift
 	returnvalue=0
@@ -844,6 +847,8 @@ case $1 in # If verb ($1) is:
 		returnvalue=1
 	    else
 		createproject $project
+		[ $? -eq 0 ] || returnvalue=1
+		enableproject $project
 		[ $? -eq 0 ] || returnvalue=1
 	    fi
 	done
@@ -887,6 +892,7 @@ case $1 in # If verb ($1) is:
 		returnvalue=1
 	    else
 		unarchiveproject $archive || returnvalue=1
+		enableproject $(echo $archive | cut -f 2 -d ".")
 	    fi
 	done
 	return $returnvalue
@@ -896,7 +902,9 @@ case $1 in # If verb ($1) is:
 	[ -z "$2" ] || [ -z "$3" ] || [ -n "$4" ] && { printhelpmessage; exit 1; }
 	[ "$(getid "$2")" != "project" ] && { printhelpmessage; exit 1; }
 	[ -n "$(getid "$3")" ] && { printhelpmessage; exit 1; }
+	[ -L $workingdir/"$2" ] && { projectwasenabled="yes"; disableproject "$2"; }
 	renameproject "$2" "$3"
+	[ "$projectwasenabled" = "yes" ] && enableproject "$3"
 	;;
 
     renamecategory|rnc) # Renames a category.
@@ -988,6 +996,7 @@ case $1 in # If verb ($1) is:
 	    else
 		unarchiveproject $archive || returnvalue=1
 		killarchive $archive || returnvalue=1
+		enableproject $archive || returnvalue=1
 	    fi
 	done
 	return $returnvalue
