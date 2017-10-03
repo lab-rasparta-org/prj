@@ -68,8 +68,8 @@ This might not be ideal since the user might pollute the "working directory" wit
 Some say it is not done until the documentation is ready!
 :-P
 
+* DONE The wheel has been reinvented. Now it is time to test it.
+See if the script behaves appropriately and fix any issues.
+
 * TODO Revise the webpage
 It is "documentation" as well!...
-
-* TODO The wheel has been reinvented. Now it is time to test it.
-See if the script behaves appropriately and fix any issues.
